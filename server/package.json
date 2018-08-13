@@ -1,0 +1,23 @@
+{
+  "name": "nqmulti",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "SLUX",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.15.3",
+    "gen-id": "^0.1.1",
+    "my-local-ip": "^1.0.0",
+    "os": "^0.1.1",
+    "shortid": "^2.2.8",
+    "socket.io": "^2.0.3"
+  },
+  "engines": {
+    "node": "0.12.7"
+  }
+}
