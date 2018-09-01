@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import kz.enu.Registry;
 import kz.enu.TheTogyzQumalaq;
-import kz.enu.system.Util;
 
 /**
  * Created by SLUX on 26.06.2017.
@@ -27,7 +26,7 @@ public class LoadingState extends State {
         counter = 0;
         points = 0;
         progressBar = "";
-        oBlackBackground = Util.getTexture(Registry.BLACK_BG, "");
+        oBlackBackground = new Texture(Registry.BLACK_BG);
         camera.setToOrtho(false, TheTogyzQumalaq.WIDTH,TheTogyzQumalaq.HEIGHT);
         GlyphLayout glyphLayout = new GlyphLayout();
         glyphLayout.setText(TheTogyzQumalaq.getMainFont(),TheTogyzQumalaq.LOCALE[14]);

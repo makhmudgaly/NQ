@@ -61,7 +61,7 @@ public class DesignState extends State implements InputProcessor {
         Gdx.input.setInputProcessor(this);
         Gdx.input.setCatchBackKey(true);
         this.selectedLanguage = selectedLanguage;
-        bg = new Texture(Registry.BACKGROUND + TheTogyzQumalaq.POSTFIX+".png");
+        bg = Util.getTexture(Registry.BACKGROUND);
         fileHandle = Gdx.files.local("profile.txt");
         try {
             pw = new PrintWriter(fileHandle.file());
@@ -79,18 +79,18 @@ public class DesignState extends State implements InputProcessor {
         glyphLayout.reset();
         glyphLayout.setText(TheTogyzQumalaq.getMainFont(),TheTogyzQumalaq.LOCALE[17]);
         wBack = glyphLayout.width;
-        homeTexture = new Texture(Registry.HOME + TheTogyzQumalaq.POSTFIX+".png");
-        soundOnTexture = new Texture(Registry.SOUND + TheTogyzQumalaq.POSTFIX+".png");
+        homeTexture = Util.getTexture(Registry.HOME);
+        soundOnTexture = Util.getTexture(Registry.SOUND);
         exampleOutglow = new Texture(Registry.EXAMPLE_OUTGLOW);
-        soundOffTexture = new Texture(Registry.SOUND_OFF + TheTogyzQumalaq.POSTFIX+".png");
-        wrapperTexture = new Texture(Registry.WRAPPER + TheTogyzQumalaq.POSTFIX + ".png");
+        soundOffTexture = Util.getTexture(Registry.SOUND_OFF);
+        wrapperTexture = Util.getTexture(Registry.WRAPPER);
         soundTexture = TheTogyzQumalaq.bPlaySound ?soundOnTexture:soundOffTexture;
         homeRectangle = new Rectangle(812f,465f,homeTexture.getWidth()+20,homeTexture.getHeight()+20);
         soundRectangle = new Rectangle(812f,400f,soundTexture.getWidth()+20,soundTexture.getHeight()+20);
         acceptRectangle = new Rectangle(754f,30f,wOK+100f,70f);
         exampleRectangle = new Rectangle(175f,135f,exampleOutglow.getWidth(),exampleOutglow.getHeight());
         backRectangle = new Rectangle(0f,30f,wBack+20f,70f);
-        blackSprite = new Sprite(Util.getTexture(Registry.BLACK_BG, ""));
+        blackSprite = new Sprite(new Texture(Registry.BLACK_BG));
         alpha = 1f;
         blackSprite.setAlpha(alpha);
         blackSprite.setPosition(0,0);

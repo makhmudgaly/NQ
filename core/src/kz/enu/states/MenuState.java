@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector3;
 
 import kz.enu.Registry;
 import kz.enu.TheTogyzQumalaq;
+import kz.enu.system.Util;
 
 /**
  * Created by SLUX on 17.05.2017.
@@ -60,7 +61,7 @@ public class MenuState extends State implements InputProcessor {
     }
 
     private void initTextures(String POSTFIX) {
-        background = new Texture(Registry.MAIN_MENU + POSTFIX + ".png");
+        background = Util.getTexture(Registry.MAIN_MENU);
 
     }
 

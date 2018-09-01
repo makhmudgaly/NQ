@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import kz.enu.Registry;
 import kz.enu.TheTogyzQumalaq;
+import kz.enu.system.Util;
 
 
 /**
@@ -25,7 +26,7 @@ public class GameOver extends State {
 
     public GameOver(GameStateManager gsm) {
         super(gsm);
-        background = new Texture(Registry.BACKGROUND + TheTogyzQumalaq.POSTFIX + ".png");
+        background = Util.getTexture(Registry.BACKGROUND);
 
         win = Gdx.audio.newSound(Gdx.files.internal(Registry.WIN));
         if (TheTogyzQumalaq.bPlaySound) win.play();

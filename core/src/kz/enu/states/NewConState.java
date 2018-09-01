@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector3;
 
 import kz.enu.Registry;
 import kz.enu.TheTogyzQumalaq;
+import kz.enu.system.Util;
 
 /**
  * Created by SLUX on 07.06.2017.
@@ -35,7 +36,7 @@ public class NewConState extends State implements InputProcessor {
         Gdx.input.setCatchBackKey(true);
         backAnimatino = false;
         offset = TheTogyzQumalaq.WIDTH*0.56f;
-        background = new Texture(Registry.MAIN_MENU + TheTogyzQumalaq.POSTFIX+".png");
+        background = Util.getTexture(Registry.MAIN_MENU);
         GlyphLayout glyphLayout = new GlyphLayout();
         glyphLayout.setText(TheTogyzQumalaq.getMainFont(),TheTogyzQumalaq.LOCALE[3]);
         wNew = glyphLayout.width;

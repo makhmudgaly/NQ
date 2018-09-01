@@ -309,7 +309,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
 
         // Transition animation
         alpha = 1f;
-        blackSprite = new Sprite(Util.getTexture(Registry.BLACK_BG, ""));
+        blackSprite = new Sprite(new Texture(Registry.BLACK_BG));
         blackSprite.setAlpha(alpha);
         blackSprite.setPosition(0, 0);
     }
@@ -356,7 +356,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         stoneBankTexture = Util.getTexture(Registry.STONE_BANK);
         stoneTexture = Util.getTexture(Registry.STONE);
         tuzdykTexture = Util.getTexture(Registry.TUZDYK);
-        glowTexture = Util.getTexture(Registry.GLOW);
+        glowTexture = new Texture(Registry.GLOW);
         turnUpTexture = Util.getTexture(Registry.TURN_UP);
         turnDownTexture = Util.getTexture(Registry.TURN_DOWN);
         undoTexture = Util.getTexture(Registry.UNDO);

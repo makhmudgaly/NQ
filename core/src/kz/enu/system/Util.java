@@ -10,12 +10,8 @@ import kz.enu.TheTogyzQumalaq;
 
 final public class Util {
     static public Texture getTexture(String sFileName) {
-        String sExtension = "png";
-        return new Texture(sFileName + TheTogyzQumalaq.POSTFIX + "." + sExtension);
-    }
-
-    static public Texture getTexture(String sFileName, String sExtension) {
-        return new Texture(sFileName + TheTogyzQumalaq.POSTFIX + "." + sExtension);
+        String sExtension = ".png";
+        return new Texture(sFileName + TheTogyzQumalaq.POSTFIX + sExtension);
     }
 
     static public Sound getSound(String sSoundName) {
