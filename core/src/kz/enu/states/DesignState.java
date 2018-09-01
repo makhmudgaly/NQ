@@ -20,7 +20,7 @@ import kz.enu.TheTogyzQumalaq;
 
 import static kz.enu.ResID.skinsList;
 import static kz.enu.TheTogyzQumalaq.botLevel;
-import static kz.enu.TheTogyzQumalaq.sound;
+import static kz.enu.TheTogyzQumalaq.bPlaySound;
 
 /**
  * Created by SLUX on 27.06.2017.
@@ -68,23 +68,23 @@ public class DesignState extends State implements InputProcessor {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        selectedTheme = TheTogyzQumalaq.getIndexOfTheme();
+        selectedTheme = TheTogyzQumalaq.getIndexOfTheme() + 1;
         initTextureArray();
 
-        glyphLayout.setText(TheTogyzQumalaq.getBitmapFont(),"OK");
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(),"OK");
         wOK = glyphLayout.width;
         glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getBitmapFont(),ResID.SKINS_NAME[selectedLanguage][selectedTheme]);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(),ResID.SKINS_NAME[selectedLanguage][selectedTheme]);
         wSkinName = glyphLayout.width;
         glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getBitmapFont(),TheTogyzQumalaq.WORDS[17]);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(),TheTogyzQumalaq.LOCALE[17]);
         wBack = glyphLayout.width;
         homeTexture = new Texture(ResID.HOME + TheTogyzQumalaq.POSTFIX+".png");
         soundOnTexture = new Texture(ResID.SOUND + TheTogyzQumalaq.POSTFIX+".png");
         exampleOutglow = new Texture(ResID.EXAMPLE_OUTGLOW);
         soundOffTexture = new Texture(ResID.SOUND_OFF + TheTogyzQumalaq.POSTFIX+".png");
         wrapperTexture = new Texture(ResID.WRAPPER + TheTogyzQumalaq.POSTFIX + ".png");
-        soundTexture = TheTogyzQumalaq.sound?soundOnTexture:soundOffTexture;
+        soundTexture = TheTogyzQumalaq.bPlaySound ?soundOnTexture:soundOffTexture;
         homeRectangle = new Rectangle(812f,465f,homeTexture.getWidth()+20,homeTexture.getHeight()+20);
         soundRectangle = new Rectangle(812f,400f,soundTexture.getWidth()+20,soundTexture.getHeight()+20);
         acceptRectangle = new Rectangle(754f,30f,wOK+100f,70f);
@@ -116,22 +116,15 @@ public class DesignState extends State implements InputProcessor {
             Vector3 tmp = new Vector3(Gdx.input.getX(),Gdx.input.getY(),0);
             camera.unproject(tmp);
 
-            /*for(int i = 0;i<skinsList.length;i++){
-                if(examples.get(i).rectangle.contains(tmp.x,tmp.y)){
-                    if(TheTogyzQumalaq.sound)TheTogyzQumalaq.getButtonSound().play();
-                    selectedTheme = i;
-                    accept();
-                }
-            }*/
             if(acceptRectangle.contains(tmp.x,tmp.y)){
                 accept();
             }else if(backRectangle.contains(tmp.x,tmp.y)){
-                if(TheTogyzQumalaq.sound)TheTogyzQumalaq.getButtonSound().play();
+                if(TheTogyzQumalaq.bPlaySound)TheTogyzQumalaq.getButtonSound().play();
                 gsm.set(new SettingState(gsm));}
             else if(themeLeftArrowRectangle.contains(tmp.x,tmp.y)){
                 if(selectedTheme>0)selectedTheme--;
                 else selectedTheme = skinsList.length-1;
-                if(TheTogyzQumalaq.sound)TheTogyzQumalaq.getButtonSound().play();
+                if(TheTogyzQumalaq.bPlaySound)TheTogyzQumalaq.getButtonSound().play();
             }else if(themeRightArrowRectangle.contains(tmp.x,tmp.y)){
                 if(selectedTheme<skinsList.length-1)selectedTheme++;
                 else selectedTheme = 0;
@@ -139,28 +132,27 @@ public class DesignState extends State implements InputProcessor {
             }else if(homeRectangle.contains(tmp.x,tmp.y)){
                 gsm.set(new MenuState(gsm,TheTogyzQumalaq.POSTFIX));
             }else if(soundRectangle.contains(tmp.x,tmp.y)){
-                if(sound){
-                    sound = false;
-                    TheTogyzQumalaq.getMusic().pause();
+                if(bPlaySound){
+                    bPlaySound = false;
+                    TheTogyzQumalaq.getBackgroundMusic().pause();
                     soundTexture = soundOffTexture;
                 }else {
-                    sound = true;
-                    TheTogyzQumalaq.getMusic().play();
+                    bPlaySound = true;
+                    TheTogyzQumalaq.getBackgroundMusic().play();
                     soundTexture = soundOnTexture;
                 }
             }
-            //System.out.println("[X:"+tmp.x +"][Y:"+ tmp.y+"]");
         }
     }
 
     private void accept(){
-        TheTogyzQumalaq.getMusic().pause();
-        TheTogyzQumalaq.getMusic().dispose();
+        TheTogyzQumalaq.getBackgroundMusic().pause();
+        TheTogyzQumalaq.getBackgroundMusic().dispose();
         pw.println(skinsList[selectedTheme]);
-        pw.println(TheTogyzQumalaq.sound);
+        pw.println(TheTogyzQumalaq.bPlaySound);
         pw.println(selectedLanguage);
         pw.println(botLevel);
-        pw.println((int)(TheTogyzQumalaq.getMusic().getVolume()*32));
+        pw.println((int)(TheTogyzQumalaq.getBackgroundMusic().getVolume()*32));
         pw.flush();
         new TheTogyzQumalaq().reboot();
         gsm.set(new MenuState(gsm,TheTogyzQumalaq.POSTFIX));
@@ -173,7 +165,7 @@ public class DesignState extends State implements InputProcessor {
             blackSprite.setAlpha(alpha);
         }
         glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getBitmapFont(),ResID.SKINS_NAME[selectedLanguage][selectedTheme]);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(),ResID.SKINS_NAME[selectedLanguage][selectedTheme]);
         wSkinName = glyphLayout.width;
         handleInput();
     }
@@ -187,11 +179,11 @@ public class DesignState extends State implements InputProcessor {
         //bitmapFont.draw(sb,"In development process. . .\nTouch to go back",TheTogyzQumalaq.WIDTH/2,TheTogyzQumalaq.HEIGHT/2);
             sb.draw(examples.get(selectedTheme).texture,examples.get(selectedTheme).x,examples.get(selectedTheme).y);
         examples.get(selectedTheme).glow(sb,exampleOutglow);
-        TheTogyzQumalaq.getBitmapFontLil().draw(sb,ResID.LEFT_ARROW,110f,320f);
-        TheTogyzQumalaq.getBitmapFontLil().draw(sb,ResID.RIGTH_ARROW,750f,320f);
-        TheTogyzQumalaq.getBitmapFont().draw(sb,ResID.SKINS_NAME[selectedLanguage][selectedTheme],(TheTogyzQumalaq.WIDTH-wSkinName)/2,90f);
-        TheTogyzQumalaq.getBitmapFont().draw(sb,"OK",754,90f);
-        TheTogyzQumalaq.getBitmapFont().draw(sb,TheTogyzQumalaq.WORDS[17],20f,90f);
+        TheTogyzQumalaq.getSecondaryFont().draw(sb,ResID.LEFT_ARROW,110f,320f);
+        TheTogyzQumalaq.getSecondaryFont().draw(sb,ResID.RIGTH_ARROW,750f,320f);
+        TheTogyzQumalaq.getMainFont().draw(sb,ResID.SKINS_NAME[selectedLanguage][selectedTheme],(TheTogyzQumalaq.WIDTH-wSkinName)/2,90f);
+        TheTogyzQumalaq.getMainFont().draw(sb,"OK",754,90f);
+        TheTogyzQumalaq.getMainFont().draw(sb,TheTogyzQumalaq.LOCALE[17],20f,90f);
         sb.draw(homeTexture,822f,475f);
         sb.draw(soundTexture,822f,410f);
         if(alpha>0) {

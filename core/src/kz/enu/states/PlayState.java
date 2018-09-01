@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
@@ -33,7 +32,7 @@ import kz.enu.sprites.Board;
 import kz.enu.sprites.Slot;
 import kz.enu.sprites.StoneBank;
 
-import static kz.enu.TheTogyzQumalaq.sound;
+import static kz.enu.TheTogyzQumalaq.bPlaySound;
 
 
 /**
@@ -190,7 +189,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         shots.clear();
 
         if (opponentID.equals("") && TheTogyzQumalaq.getCreateConnect() == ResID.CONNECT && mode == ResID.INTERNET) {
-            Gdx.input.getTextInput(this, TheTogyzQumalaq.WORDS[23], "", "");
+            Gdx.input.getTextInput(this, TheTogyzQumalaq.LOCALE[23], "", "");
 
         }
     }
@@ -254,25 +253,25 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
     public static String getGameOverWords() {
         if (mode == ResID.SINGLE_PLAYER) {
             if (isAtsyrau()) {
-                if (!turn) return TheTogyzQumalaq.WORDS[9];
-                else return TheTogyzQumalaq.WORDS[10];
+                if (!turn) return TheTogyzQumalaq.LOCALE[9];
+                else return TheTogyzQumalaq.LOCALE[10];
             } else if (stoneBanks[0].currentStonesNumber == 81 && stoneBanks[1].currentStonesNumber == 81) {
-                return TheTogyzQumalaq.WORDS[11];
+                return TheTogyzQumalaq.LOCALE[11];
             } else if (stoneBanks[0].currentStonesNumber > stoneBanks[1].currentStonesNumber) {
-                return TheTogyzQumalaq.WORDS[9];
+                return TheTogyzQumalaq.LOCALE[9];
             } else {
-                return TheTogyzQumalaq.WORDS[10];
+                return TheTogyzQumalaq.LOCALE[10];
             }
         } else if (mode == ResID.MULTIPLAYER || mode == ResID.INTERNET) {
             if (isAtsyrau()) {
-                if (!turn) return TheTogyzQumalaq.WORDS[12];
-                else return TheTogyzQumalaq.WORDS[13];
+                if (!turn) return TheTogyzQumalaq.LOCALE[12];
+                else return TheTogyzQumalaq.LOCALE[13];
             } else if (stoneBanks[0].currentStonesNumber == 81 && stoneBanks[1].currentStonesNumber == 81) {
-                return TheTogyzQumalaq.WORDS[11];
+                return TheTogyzQumalaq.LOCALE[11];
             } else if (stoneBanks[0].currentStonesNumber > stoneBanks[1].currentStonesNumber) {
-                return TheTogyzQumalaq.WORDS[12];
+                return TheTogyzQumalaq.LOCALE[12];
             } else {
-                return TheTogyzQumalaq.WORDS[13];
+                return TheTogyzQumalaq.LOCALE[13];
             }
         } else {
             return "";
@@ -319,7 +318,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         homeTexture = new Texture(ResID.HOME + TheTogyzQumalaq.POSTFIX + ".png");
         soundOnTexture = new Texture(ResID.SOUND + TheTogyzQumalaq.POSTFIX + ".png");
         soundOffTexture = new Texture(ResID.SOUND_OFF + TheTogyzQumalaq.POSTFIX + ".png");
-        soundTexture = sound ? soundOnTexture : soundOffTexture;
+        soundTexture = bPlaySound ? soundOnTexture : soundOffTexture;
         undoRectangle = new Rectangle(812f, 465f, undoTexture.getWidth() + 20, undoTexture.getHeight() + 20);
         homeRectangle = new Rectangle(812f, 41f, homeTexture.getWidth() + 20, homeTexture.getHeight() + 20);
         soundRectangle = new Rectangle(812f, 96f, soundTexture.getWidth() + 20, soundTexture.getHeight() + 20);
@@ -343,10 +342,10 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         bitmapFontFlipped.getData().setScale(-1, 1);
         bitmapFontIceCreamFlipped.getData().setScale(-1, 1);
         generator.dispose();
-        glyphLayout.setText(TheTogyzQumalaq.getBitmapFont(), TheTogyzQumalaq.WORDS[21]);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(), TheTogyzQumalaq.LOCALE[21]);
         wWaiting = glyphLayout.width;
         glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getBitmapFont(), TheTogyzQumalaq.WORDS[22] + "000000000");
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(), TheTogyzQumalaq.LOCALE[22] + "000000000");
         wYourId = glyphLayout.width;
         glyphLayout.reset();
         effective = Gdx.audio.newSound(Gdx.files.internal(ResID.EFFECTIVE_MOVE));
@@ -375,18 +374,18 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
 
                 undo();
             } else if (homeRectangle.contains(tmp.x, tmp.y)) {
-                if (TheTogyzQumalaq.sound) TheTogyzQumalaq.getButtonSound().play();
+                if (TheTogyzQumalaq.bPlaySound) TheTogyzQumalaq.getButtonSound().play();
                 if (mode == ResID.INTERNET) socket.disconnect();
                 gsm.set(new MenuState(gsm, TheTogyzQumalaq.POSTFIX));
             } else if (soundRectangle.contains(tmp.x, tmp.y)) {
 
-                if (sound) {
-                    sound = false;
-                    TheTogyzQumalaq.getMusic().pause();
+                if (bPlaySound) {
+                    bPlaySound = false;
+                    TheTogyzQumalaq.getBackgroundMusic().pause();
                     soundTexture = soundOffTexture;
                 } else {
-                    sound = true;
-                    TheTogyzQumalaq.getMusic().play();
+                    bPlaySound = true;
+                    TheTogyzQumalaq.getBackgroundMusic().play();
                     soundTexture = soundOnTexture;
                 }
             } else if (mode == ResID.INTERNET) {
@@ -570,7 +569,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
             sb.draw(undoTexture, 822f, 475f);
             sb.draw(homeTexture, 822f, 42f);
             sb.draw(soundTexture, 822f, 106f);
-            if (think) TheTogyzQumalaq.getBitmapFont().draw(sb, thinkingBar, 822f, 440f);
+            if (think) TheTogyzQumalaq.getMainFont().draw(sb, thinkingBar, 822f, 440f);
 
 
             if (turn) {
@@ -580,8 +579,8 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
             }
         } else {
             if (opponentID.equals("") && TheTogyzQumalaq.getCreateConnect() == ResID.CREATE && mode == ResID.INTERNET) {
-                TheTogyzQumalaq.getBitmapFont().draw(sb, TheTogyzQumalaq.WORDS[21], (TheTogyzQumalaq.WIDTH - wWaiting) / 2, TheTogyzQumalaq.HEIGHT / 2);
-                TheTogyzQumalaq.getBitmapFont().draw(sb, TheTogyzQumalaq.WORDS[22] + myID, (TheTogyzQumalaq.WIDTH - wYourId) / 2, TheTogyzQumalaq.HEIGHT / 2 + 100f);
+                TheTogyzQumalaq.getMainFont().draw(sb, TheTogyzQumalaq.LOCALE[21], (TheTogyzQumalaq.WIDTH - wWaiting) / 2, TheTogyzQumalaq.HEIGHT / 2);
+                TheTogyzQumalaq.getMainFont().draw(sb, TheTogyzQumalaq.LOCALE[22] + myID, (TheTogyzQumalaq.WIDTH - wYourId) / 2, TheTogyzQumalaq.HEIGHT / 2 + 100f);
             }
         }
         if (alpha > 0) {
@@ -697,7 +696,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
 
         } else {
             turn ^= true;
-            if (sound && (mode == ResID.SINGLE_PLAYER && !turn || (mode == ResID.MULTIPLAYER || mode == ResID.INTERNET)))
+            if (bPlaySound && (mode == ResID.SINGLE_PLAYER && !turn || (mode == ResID.MULTIPLAYER || mode == ResID.INTERNET)))
                 error.play();
             return -1;
         }
@@ -736,13 +735,13 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
 
                 if (slots[lastSlotIndex].currentStonesNumber % 2 == 0) {
 
-                    if (slots[lastSlotIndex].currentStonesNumber >= 16 && sound) jackpot.play();
+                    if (slots[lastSlotIndex].currentStonesNumber >= 16 && bPlaySound) jackpot.play();
 
                     stoneBanks[turn ? 0 : 1].currentStonesNumber += slots[lastSlotIndex].currentStonesNumber;
 
                     slots[lastSlotIndex].currentStonesNumber = 0;
 
-                    if (sound) {
+                    if (bPlaySound) {
                         effective.play();
                     }
                     isEffective = true;
@@ -757,7 +756,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
                         slots[lastSlotIndex].texture = tuzdykTexture;
                         stoneBanks[turn ? 0 : 1].currentStonesNumber += slots[lastSlotIndex].currentStonesNumber;
                         slots[lastSlotIndex].currentStonesNumber = 0;
-                        if (sound) tuzdykSound.play();
+                        if (bPlaySound) tuzdykSound.play();
                         isEffective = true;
                         isMoveTuzdykMaker = true;
                     }
@@ -765,7 +764,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
                 prevMove = move;
             }
             if (!isEffective)
-                if (sound) {
+                if (bPlaySound) {
                     empty.play();
                 }
             isEffective = false;
@@ -941,7 +940,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
             animationStarted = true;
 
         } catch (ArrayIndexOutOfBoundsException aiEx) {
-            if (sound) error.play();
+            if (bPlaySound) error.play();
         }
 
     }
