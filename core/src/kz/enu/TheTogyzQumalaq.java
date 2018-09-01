@@ -16,6 +16,7 @@ import java.util.Scanner;
 import kz.enu.states.GameStateManager;
 import kz.enu.states.MenuState;
 import kz.enu.system.FontManager;
+import kz.enu.system.Util;
 
 public class TheTogyzQumalaq extends ApplicationAdapter {
 
@@ -31,7 +32,7 @@ public class TheTogyzQumalaq extends ApplicationAdapter {
     private static SpriteBatch batch;
     public static String[] LOCALE;
     public static int botLevel = 0;
-    private static int createConnect = ResID.CREATE;
+    private static int createConnect = Registry.CREATE;
 
     public static int getCreateConnect() {
         return createConnect;
@@ -94,14 +95,14 @@ public class TheTogyzQumalaq extends ApplicationAdapter {
             POSTFIX = in.nextLine();
             bPlaySound = in.nextBoolean();
             LANGUAGE = in.nextInt();
-            LOCALE = ResID.DICTIONARY[LANGUAGE];
+            LOCALE = Registry.DICTIONARY[LANGUAGE];
             botLevel = in.nextInt();
             fMusicVolume = in.nextInt() / 32f;
             in.close();
         } catch (Exception ex) {
             POSTFIX = "taha";
             bPlaySound = true;
-            LOCALE = ResID.DICTIONARY[0];
+            LOCALE = Registry.DICTIONARY[0];
             botLevel = 0;
             fMusicVolume = 0.1f;
         }
@@ -119,23 +120,27 @@ public class TheTogyzQumalaq extends ApplicationAdapter {
         if (getIndexOfTheme() != 8 && getIndexOfTheme() != 9) {
             fBorderWidth = 1.5f;
         }
-        Color oFontColor = ResID.COLORS[getIndexOfTheme()];
+        Color oFontColor = Registry.COLORS[getIndexOfTheme()];
         Color oBorderColor = new Color(0f, 0f, 0f, 1f);
-        oMainFont = FontManager.getFont("segoeui.ttf", 50, oFontColor, fBorderWidth, oBorderColor);
-        oSecondaryFont = FontManager.getFont("arial.ttf", 50, oFontColor, fBorderWidth, oBorderColor);
+        oMainFont = FontManager.getFont("segoeui.ttf", 50, oFontColor, fBorderWidth, oBorderColor, false);
+        oSecondaryFont = FontManager.getFont("arial.ttf", 50, oFontColor, fBorderWidth, oBorderColor, false);
 
         // Cleaning canvas
         Gdx.gl.glClearColor(1, 0, 0, 1);
 
         // Music settings
-        oBackgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(ResID.MUSIC + POSTFIX + ".mp3"));
-        oButtonSound = Gdx.audio.newSound(Gdx.files.internal(ResID.BUTTON));
-        oBackgroundMusic.setVolume(fMusicVolume);
-        oBackgroundMusic.setLooping(true);
-        if (bPlaySound) oBackgroundMusic.play();
+        loadMusic();
 
         // Scene generation
         gsm.push(new MenuState(gsm, POSTFIX));
+    }
+
+    private static void loadMusic() {
+        oBackgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(Registry.MUSIC + POSTFIX + ".mp3"));
+        oButtonSound = Util.getSound(Registry.BUTTON);
+        oBackgroundMusic.setVolume(fMusicVolume);
+        oBackgroundMusic.setLooping(true);
+        if (bPlaySound) oBackgroundMusic.play();
     }
 
     public void reboot() {
@@ -144,8 +149,8 @@ public class TheTogyzQumalaq extends ApplicationAdapter {
     }
 
     public static int getIndexOfTheme() {
-        for (int i = 0; i < ResID.skinsList.length; i++) {
-            if (POSTFIX.equals(ResID.skinsList[i])) return i;
+        for (int i = 0; i < Registry.skinsList.length; i++) {
+            if (POSTFIX.equals(Registry.skinsList[i])) return i;
         }
         return -1;
     }

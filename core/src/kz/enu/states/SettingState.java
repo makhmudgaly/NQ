@@ -14,10 +14,11 @@ import com.badlogic.gdx.math.Vector3;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
-import kz.enu.ResID;
+import kz.enu.Registry;
 import kz.enu.TheTogyzQumalaq;
+import kz.enu.system.Util;
 
-import static kz.enu.ResID.skinsList;
+import static kz.enu.Registry.skinsList;
 import static kz.enu.TheTogyzQumalaq.botLevel;
 import static kz.enu.TheTogyzQumalaq.getMainFont;
 import static kz.enu.TheTogyzQumalaq.bPlaySound;
@@ -45,7 +46,6 @@ public class SettingState extends State implements InputProcessor {
     private static boolean isAnyThinkChanged;
 
     private static Sprite blackSprite;
-    private static Texture blackBackground;
 
     private Rectangle homeRectangle;
     private Rectangle soundRectangle;
@@ -64,7 +64,7 @@ public class SettingState extends State implements InputProcessor {
         Gdx.input.setInputProcessor(this);
         Gdx.input.setCatchBackKey(true);
         isAnyThinkChanged = false;
-        bg = new Texture(ResID.BACKGROUND + TheTogyzQumalaq.POSTFIX+".png");
+        bg = new Texture(Registry.BACKGROUND + TheTogyzQumalaq.POSTFIX+".png");
         fileHandle = Gdx.files.local("profile.txt");
         try {
             pw = new PrintWriter(fileHandle.file());
@@ -96,29 +96,28 @@ public class SettingState extends State implements InputProcessor {
         wMusic = glyphLayout.width;
 
         //System.out.println(wProgress);
-        homeTexture = new Texture(ResID.HOME + TheTogyzQumalaq.POSTFIX+".png");
-        soundOnTexture = new Texture(ResID.SOUND + TheTogyzQumalaq.POSTFIX+".png");
-        soundOffTexture = new Texture(ResID.SOUND_OFF + TheTogyzQumalaq.POSTFIX+".png");
-        wrapperTexture = new Texture(ResID.WRAPPER + TheTogyzQumalaq.POSTFIX+".png");
+        homeTexture = new Texture(Registry.HOME + TheTogyzQumalaq.POSTFIX+".png");
+        soundOnTexture = new Texture(Registry.SOUND + TheTogyzQumalaq.POSTFIX+".png");
+        soundOffTexture = new Texture(Registry.SOUND_OFF + TheTogyzQumalaq.POSTFIX+".png");
+        wrapperTexture = new Texture(Registry.WRAPPER + TheTogyzQumalaq.POSTFIX+".png");
         soundTexture = TheTogyzQumalaq.bPlaySound ?soundOnTexture:soundOffTexture;
         homeRectangle = new Rectangle(812f,465f,homeTexture.getWidth()+20,homeTexture.getHeight()+20);
         soundRectangle = new Rectangle(812f,400f,soundTexture.getWidth()+20,soundTexture.getHeight()+20);
         acceptRectangle = new Rectangle(754f,30f,wOK+100f,70f);
         designRectangle = new Rectangle(120f,440f,wrapperTexture.getWidth(),80f);
 
-        blackBackground = new Texture(ResID.BLACK_BG);
-        blackSprite = new Sprite(blackBackground);
+        blackSprite = new Sprite(Util.getTexture(Registry.BLACK_BG, ""));
         alpha = 1f;
         blackSprite.setAlpha(alpha);
         blackSprite.setPosition(0,0);
 
         languageLeftArrowRectangle = new Rectangle(420f,250f,43f,50f);
-        languageRightArrowRectangle = new Rectangle(420f+43f+ getMainFont().getSpaceWidth()*2+ResID.LANGUAGE_WIDTH[2],250f,43f,50f);
+        languageRightArrowRectangle = new Rectangle(420f+43f+ getMainFont().getSpaceWidth()*2+ Registry.LANGUAGE_WIDTH[2],250f,43f,50f);
         difficultyLeftArrowRectangle = new Rectangle(420f,350f,43f,50f);
-        difficultyRightArrowRectangle = new Rectangle(420f+43f+ getMainFont().getSpaceWidth()*2+ResID.LANGUAGE_WIDTH[2],350f,43f,50f);
+        difficultyRightArrowRectangle = new Rectangle(420f+43f+ getMainFont().getSpaceWidth()*2+ Registry.LANGUAGE_WIDTH[2],350f,43f,50f);
         initSlider();
         camera.setToOrtho(false, TheTogyzQumalaq.WIDTH,TheTogyzQumalaq.HEIGHT);
-        //System.out.println((420f+43f+getMainFont().getSpaceWidth()*2+ResID.LANGUAGE_WIDTH[2]));
+        //System.out.println((420f+43f+getMainFont().getSpaceWidth()*2+Registry.LANGUAGE_WIDTH[2]));
         volumeSlider = new Rectangle(420f,140f,wProgress,60f);
     }
 
@@ -211,14 +210,14 @@ public class SettingState extends State implements InputProcessor {
         TheTogyzQumalaq.getMainFont().draw(sb,TheTogyzQumalaq.LOCALE[15],(wrapperTexture.getWidth()-wDesign)/2+120f,500f);
 
         TheTogyzQumalaq.getMainFont().draw(sb,TheTogyzQumalaq.LOCALE[6],420f-wLanguage,300f);
-        TheTogyzQumalaq.getSecondaryFont().draw(sb,ResID.LEFT_ARROW,420f,300f);
-        TheTogyzQumalaq.getMainFont().draw(sb,ResID.LANGUAGES[selectedLanguage],420f+63f+(getMainFont().getSpaceWidth()*2+ResID.LANGUAGE_WIDTH[2] - ResID.LANGUAGE_WIDTH[selectedLanguage])/2,300f);
-        TheTogyzQumalaq.getSecondaryFont().draw(sb,ResID.RIGTH_ARROW,420f+43f+ getMainFont().getSpaceWidth()*2+ResID.LANGUAGE_WIDTH[2],300f);
+        TheTogyzQumalaq.getSecondaryFont().draw(sb, Registry.LEFT_ARROW,420f,300f);
+        TheTogyzQumalaq.getMainFont().draw(sb, Registry.LANGUAGES[selectedLanguage],420f+63f+(getMainFont().getSpaceWidth()*2+ Registry.LANGUAGE_WIDTH[2] - Registry.LANGUAGE_WIDTH[selectedLanguage])/2,300f);
+        TheTogyzQumalaq.getSecondaryFont().draw(sb, Registry.RIGTH_ARROW,420f+43f+ getMainFont().getSpaceWidth()*2+ Registry.LANGUAGE_WIDTH[2],300f);
 
         TheTogyzQumalaq.getMainFont().draw(sb,TheTogyzQumalaq.LOCALE[7],420f-wDifficulty,400f);
-        TheTogyzQumalaq.getSecondaryFont().draw(sb,ResID.LEFT_ARROW,420f,400f);
-        TheTogyzQumalaq.getMainFont().draw(sb,TheTogyzQumalaq.LOCALE[8]+" "+(TheTogyzQumalaq.botLevel+1),420f+ getMainFont().getSpaceWidth()+43f+ResID.LEVEL_OFFSET[oldSelectedLanguage],400f);
-        TheTogyzQumalaq.getSecondaryFont().draw(sb,ResID.RIGTH_ARROW,420f+43+ getMainFont().getSpaceWidth()*2+ResID.LANGUAGE_WIDTH[2],400f);
+        TheTogyzQumalaq.getSecondaryFont().draw(sb, Registry.LEFT_ARROW,420f,400f);
+        TheTogyzQumalaq.getMainFont().draw(sb,TheTogyzQumalaq.LOCALE[8]+" "+(TheTogyzQumalaq.botLevel+1),420f+ getMainFont().getSpaceWidth()+43f+ Registry.LEVEL_OFFSET[oldSelectedLanguage],400f);
+        TheTogyzQumalaq.getSecondaryFont().draw(sb, Registry.RIGTH_ARROW,420f+43+ getMainFont().getSpaceWidth()*2+ Registry.LANGUAGE_WIDTH[2],400f);
 
         TheTogyzQumalaq.getMainFont().draw(sb,volumeSliderBar,420f,200f);
         TheTogyzQumalaq.getMainFont().draw(sb,TheTogyzQumalaq.LOCALE[16],420f-wMusic,200f);

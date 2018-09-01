@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 
-import kz.enu.ResID;
+import kz.enu.Registry;
 import kz.enu.TheTogyzQumalaq;
 
 /**
@@ -60,7 +60,7 @@ public class MenuState extends State implements InputProcessor {
     }
 
     private void initTextures(String POSTFIX) {
-        background = new Texture(ResID.MAIN_MENU + POSTFIX + ".png");
+        background = new Texture(Registry.MAIN_MENU + POSTFIX + ".png");
 
     }
 
@@ -108,7 +108,7 @@ public class MenuState extends State implements InputProcessor {
                     gsm.set(new SettingState(gsm));
                     break;
                 case 3:
-                    gsm.set(new LoadingState(gsm, ResID.SINGLE_PLAYER, 0));
+                    gsm.set(new LoadingState(gsm, Registry.SINGLE_PLAYER, false));
                     break;
             }
         }

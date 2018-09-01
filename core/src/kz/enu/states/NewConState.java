@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 
-import kz.enu.ResID;
+import kz.enu.Registry;
 import kz.enu.TheTogyzQumalaq;
 
 /**
@@ -17,7 +17,7 @@ import kz.enu.TheTogyzQumalaq;
  */
 
 public class NewConState extends State implements InputProcessor {
-    private static int mode;
+    private static int GAME_MODE;
     private Texture background;
     private Rectangle newRectangle;
     private Rectangle conRectangle;
@@ -30,12 +30,12 @@ public class NewConState extends State implements InputProcessor {
     private static final float boundX = 10f,boundY=10f;
     public NewConState(GameStateManager gsm,int mode) {
         super(gsm);
-        this.mode = mode;
+        GAME_MODE = mode;
         Gdx.input.setInputProcessor(this);
         Gdx.input.setCatchBackKey(true);
         backAnimatino = false;
         offset = TheTogyzQumalaq.WIDTH*0.56f;
-        background = new Texture(ResID.MAIN_MENU + TheTogyzQumalaq.POSTFIX+".png");
+        background = new Texture(Registry.MAIN_MENU + TheTogyzQumalaq.POSTFIX+".png");
         GlyphLayout glyphLayout = new GlyphLayout();
         glyphLayout.setText(TheTogyzQumalaq.getMainFont(),TheTogyzQumalaq.LOCALE[3]);
         wNew = glyphLayout.width;
@@ -74,13 +74,16 @@ public class NewConState extends State implements InputProcessor {
 
     @Override
     public void update(float dt) {
-        if(offset>0&&backAnimatino==false)offset-=18f;
-        if(backAnimatino)offset+=18f;
+        if (backAnimatino) {
+            offset += 18f;
+        } else if (offset > 0) {
+            offset -= 18f;
+        }
         handleInput();
         if(offset>=TheTogyzQumalaq.WIDTH*0.8f&&backAnimatino) {
             switch (selected) {
-                case 0:gsm.set(new LoadingState(gsm,mode,0));break;
-                case 1:gsm.set(new LoadingState(gsm,mode,1));break;
+                case 0:gsm.set(new LoadingState(gsm, GAME_MODE,false));break;
+                case 1:gsm.set(new LoadingState(gsm, GAME_MODE,true));break;
                 case 2:gsm.set(new MenuState(gsm,TheTogyzQumalaq.POSTFIX));break;
             }
         }
@@ -108,8 +111,6 @@ public class NewConState extends State implements InputProcessor {
             backAnimatino = true;
             if(TheTogyzQumalaq.bPlaySound)TheTogyzQumalaq.getButtonSound().play();
             selected = 2;
-            /*if (shouldReallyQuit)
-                Gdx.app.exit();*/
         }
         return false;
     }

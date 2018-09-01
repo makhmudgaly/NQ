@@ -15,10 +15,11 @@ import com.badlogic.gdx.utils.Array;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
-import kz.enu.ResID;
+import kz.enu.Registry;
 import kz.enu.TheTogyzQumalaq;
+import kz.enu.system.Util;
 
-import static kz.enu.ResID.skinsList;
+import static kz.enu.Registry.skinsList;
 import static kz.enu.TheTogyzQumalaq.botLevel;
 import static kz.enu.TheTogyzQumalaq.bPlaySound;
 
@@ -44,7 +45,6 @@ public class DesignState extends State implements InputProcessor {
     private int newX = 0;
 
     private static Sprite blackSprite;
-    private static Texture blackBackground;
 
 
     private Rectangle homeRectangle;
@@ -61,7 +61,7 @@ public class DesignState extends State implements InputProcessor {
         Gdx.input.setInputProcessor(this);
         Gdx.input.setCatchBackKey(true);
         this.selectedLanguage = selectedLanguage;
-        bg = new Texture(ResID.BACKGROUND + TheTogyzQumalaq.POSTFIX+".png");
+        bg = new Texture(Registry.BACKGROUND + TheTogyzQumalaq.POSTFIX+".png");
         fileHandle = Gdx.files.local("profile.txt");
         try {
             pw = new PrintWriter(fileHandle.file());
@@ -74,24 +74,23 @@ public class DesignState extends State implements InputProcessor {
         glyphLayout.setText(TheTogyzQumalaq.getMainFont(),"OK");
         wOK = glyphLayout.width;
         glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getMainFont(),ResID.SKINS_NAME[selectedLanguage][selectedTheme]);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(), Registry.SKINS_NAME[selectedLanguage][selectedTheme]);
         wSkinName = glyphLayout.width;
         glyphLayout.reset();
         glyphLayout.setText(TheTogyzQumalaq.getMainFont(),TheTogyzQumalaq.LOCALE[17]);
         wBack = glyphLayout.width;
-        homeTexture = new Texture(ResID.HOME + TheTogyzQumalaq.POSTFIX+".png");
-        soundOnTexture = new Texture(ResID.SOUND + TheTogyzQumalaq.POSTFIX+".png");
-        exampleOutglow = new Texture(ResID.EXAMPLE_OUTGLOW);
-        soundOffTexture = new Texture(ResID.SOUND_OFF + TheTogyzQumalaq.POSTFIX+".png");
-        wrapperTexture = new Texture(ResID.WRAPPER + TheTogyzQumalaq.POSTFIX + ".png");
+        homeTexture = new Texture(Registry.HOME + TheTogyzQumalaq.POSTFIX+".png");
+        soundOnTexture = new Texture(Registry.SOUND + TheTogyzQumalaq.POSTFIX+".png");
+        exampleOutglow = new Texture(Registry.EXAMPLE_OUTGLOW);
+        soundOffTexture = new Texture(Registry.SOUND_OFF + TheTogyzQumalaq.POSTFIX+".png");
+        wrapperTexture = new Texture(Registry.WRAPPER + TheTogyzQumalaq.POSTFIX + ".png");
         soundTexture = TheTogyzQumalaq.bPlaySound ?soundOnTexture:soundOffTexture;
         homeRectangle = new Rectangle(812f,465f,homeTexture.getWidth()+20,homeTexture.getHeight()+20);
         soundRectangle = new Rectangle(812f,400f,soundTexture.getWidth()+20,soundTexture.getHeight()+20);
         acceptRectangle = new Rectangle(754f,30f,wOK+100f,70f);
         exampleRectangle = new Rectangle(175f,135f,exampleOutglow.getWidth(),exampleOutglow.getHeight());
         backRectangle = new Rectangle(0f,30f,wBack+20f,70f);
-        blackBackground = new Texture(ResID.BLACK_BG);
-        blackSprite = new Sprite(blackBackground);
+        blackSprite = new Sprite(Util.getTexture(Registry.BLACK_BG, ""));
         alpha = 1f;
         blackSprite.setAlpha(alpha);
         blackSprite.setPosition(0,0);
@@ -165,7 +164,7 @@ public class DesignState extends State implements InputProcessor {
             blackSprite.setAlpha(alpha);
         }
         glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getMainFont(),ResID.SKINS_NAME[selectedLanguage][selectedTheme]);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(), Registry.SKINS_NAME[selectedLanguage][selectedTheme]);
         wSkinName = glyphLayout.width;
         handleInput();
     }
@@ -179,9 +178,9 @@ public class DesignState extends State implements InputProcessor {
         //bitmapFont.draw(sb,"In development process. . .\nTouch to go back",TheTogyzQumalaq.WIDTH/2,TheTogyzQumalaq.HEIGHT/2);
             sb.draw(examples.get(selectedTheme).texture,examples.get(selectedTheme).x,examples.get(selectedTheme).y);
         examples.get(selectedTheme).glow(sb,exampleOutglow);
-        TheTogyzQumalaq.getSecondaryFont().draw(sb,ResID.LEFT_ARROW,110f,320f);
-        TheTogyzQumalaq.getSecondaryFont().draw(sb,ResID.RIGTH_ARROW,750f,320f);
-        TheTogyzQumalaq.getMainFont().draw(sb,ResID.SKINS_NAME[selectedLanguage][selectedTheme],(TheTogyzQumalaq.WIDTH-wSkinName)/2,90f);
+        TheTogyzQumalaq.getSecondaryFont().draw(sb, Registry.LEFT_ARROW,110f,320f);
+        TheTogyzQumalaq.getSecondaryFont().draw(sb, Registry.RIGTH_ARROW,750f,320f);
+        TheTogyzQumalaq.getMainFont().draw(sb, Registry.SKINS_NAME[selectedLanguage][selectedTheme],(TheTogyzQumalaq.WIDTH-wSkinName)/2,90f);
         TheTogyzQumalaq.getMainFont().draw(sb,"OK",754,90f);
         TheTogyzQumalaq.getMainFont().draw(sb,TheTogyzQumalaq.LOCALE[17],20f,90f);
         sb.draw(homeTexture,822f,475f);

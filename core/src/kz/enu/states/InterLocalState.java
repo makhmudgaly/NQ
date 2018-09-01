@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 
-import kz.enu.ResID;
+import kz.enu.Registry;
 import kz.enu.TheTogyzQumalaq;
 
 /**
@@ -18,7 +18,7 @@ import kz.enu.TheTogyzQumalaq;
 
 public class InterLocalState extends State implements InputProcessor {
 
-    private static int mode;
+    private static int GAME_MODE;
     private Texture background;
     private Rectangle netRectangle;
     private Rectangle localRectangle;
@@ -32,12 +32,12 @@ public class InterLocalState extends State implements InputProcessor {
 
     public InterLocalState(GameStateManager gsm, int mode) {
         super(gsm);
-        this.mode = mode;
+        GAME_MODE = mode;
         Gdx.input.setInputProcessor(this);
         Gdx.input.setCatchBackKey(true);
         backAnimatino = false;
         offset = TheTogyzQumalaq.WIDTH * 0.56f;
-        background = new Texture(ResID.MAIN_MENU + TheTogyzQumalaq.POSTFIX + ".png");
+        background = new Texture(Registry.MAIN_MENU + TheTogyzQumalaq.POSTFIX + ".png");
         GlyphLayout glyphLayout = new GlyphLayout();
         glyphLayout.setText(TheTogyzQumalaq.getMainFont(), TheTogyzQumalaq.LOCALE[19]);
         wNet = glyphLayout.width;
@@ -76,8 +76,11 @@ public class InterLocalState extends State implements InputProcessor {
 
     @Override
     public void update(float dt) {
-        if (offset > 0 && backAnimatino == false) offset -= 18f;
-        if (backAnimatino) offset += 18f;
+        if (backAnimatino) {
+            offset += 18f;
+        } else if (offset > 0) {
+            offset -= 18f;
+        }
         handleInput();
         if (offset >= TheTogyzQumalaq.WIDTH * 0.8f && backAnimatino) {
             switch (selected) {
@@ -85,7 +88,7 @@ public class InterLocalState extends State implements InputProcessor {
                     gsm.set(new CreateConnectState(gsm, 0));
                     break;
                 case 1:
-                    gsm.set(new NewConState(gsm, mode));
+                    gsm.set(new NewConState(gsm, GAME_MODE));
                     break;
                 case 2:
                     gsm.set(new MenuState(gsm, TheTogyzQumalaq.POSTFIX));

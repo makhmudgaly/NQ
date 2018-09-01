@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 
-import kz.enu.ResID;
+import kz.enu.Registry;
 import kz.enu.TheTogyzQumalaq;
 
 
@@ -18,7 +18,6 @@ import kz.enu.TheTogyzQumalaq;
 public class GameOver extends State {
 
     private Texture background;
-    //private Texture wrapperTexture;
     private static final float DELAY = 1.2f;
     private static float currentTime;
     private Sound win;
@@ -26,12 +25,10 @@ public class GameOver extends State {
 
     public GameOver(GameStateManager gsm) {
         super(gsm);
-        background = new Texture(ResID.BACKGROUND + TheTogyzQumalaq.POSTFIX + ".png");
-        //wrapperTexture = new Texture(ResID.WRAPPER + TheTogyzQumalaq.POSTFIX+".png");
+        background = new Texture(Registry.BACKGROUND + TheTogyzQumalaq.POSTFIX + ".png");
 
-        win = Gdx.audio.newSound(Gdx.files.internal(ResID.WIN));
+        win = Gdx.audio.newSound(Gdx.files.internal(Registry.WIN));
         if (TheTogyzQumalaq.bPlaySound) win.play();
-        //bitmapFont.getData().setScale(2f);
         camera.setToOrtho(false, TheTogyzQumalaq.WIDTH, TheTogyzQumalaq.HEIGHT);
         currentTime = 0;
         GlyphLayout glyphLayout = new GlyphLayout();
@@ -41,7 +38,6 @@ public class GameOver extends State {
         glyphLayout.reset();
         glyphLayout.setText(TheTogyzQumalaq.getMainFont(), PlayState.getGameOverWords());
         w1 = glyphLayout.width;
-        //if (PlayState.getMode() == ResID.INTERNET) PlayState.getSocket().disconnect();
 
     }
 
@@ -64,7 +60,6 @@ public class GameOver extends State {
         sb.setProjectionMatrix(camera.combined);
         sb.begin();
         sb.draw(background, 0, 0, TheTogyzQumalaq.WIDTH, TheTogyzQumalaq.HEIGHT);
-        //sb.draw(wrapperTexture,(TheTogyzQumalaq.WIDTH-wrapperTexture.getWidth())/2,290f);
         TheTogyzQumalaq.getMainFont().draw(sb, PlayState.getGameOverWords(), (TheTogyzQumalaq.WIDTH - w1) / 2, 350f);
         if (!PlayState.isTurn()) {
             TheTogyzQumalaq.getMainFont().draw(sb, PlayState.getResult(), (TheTogyzQumalaq.WIDTH / 2) - (w / 2), TheTogyzQumalaq.HEIGHT / 2);
@@ -78,7 +73,6 @@ public class GameOver extends State {
     public void dispose() {
         background.dispose();
         win.dispose();
-        //wrapperTexture.dispose();
         System.out.println("GameOver Disposed");
     }
 
