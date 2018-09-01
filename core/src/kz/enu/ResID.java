@@ -25,7 +25,6 @@ public class ResID {
     public static String STONE_BANK = "stonebank_";
     public static String STONE = "stone_";
     public static String TUZDYK = "tuzdyk_";
-    //public static String TUZDYK_ANIMATION = "tuzdyk_animation_";
     public static String TURN_UP = "turn_up_";
     public static String TURN_DOWN = "turn_down_";
 
