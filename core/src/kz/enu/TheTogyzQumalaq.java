@@ -8,16 +8,14 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
 
 import java.util.Scanner;
 
 import kz.enu.states.GameStateManager;
 import kz.enu.states.MenuState;
-import kz.enu.states.PlayState;
+import kz.enu.system.FontManager;
 
 public class TheTogyzQumalaq extends ApplicationAdapter {
 
@@ -25,16 +23,13 @@ public class TheTogyzQumalaq extends ApplicationAdapter {
     public static final int WIDTH = 900;
     public static final int HEIGHT = 540;
     public static final String TITLE = "Nine";
-    private static final String CHAR_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzАӘБВГҒДЕЁЖЗИЙКҚЛМНҢОӨПРСТУҰҮФХҺЦЧШЩЪЫІЬЭЮЯаәбвгғдеёжзийкқлмнңоөпрстуұүфхһцчшщъыіьэюя.-?!_[](){}:;, %$+-*=0123456789■◄►|";
     public static String POSTFIX;
     public static int LANGUAGE;
-    private static BitmapFont bitmapFont;
-    private static BitmapFont bitmapFontLil;
-    private static final String FILE_PATH = "segoeui.ttf";
-    private static final String FILE_PATH2 = "arial.ttf";
+    private static BitmapFont oMainFont;
+    private static BitmapFont oSecondaryFont;
     private static GameStateManager gsm;
     private static SpriteBatch batch;
-    public static String[] WORDS;
+    public static String[] LOCALE;
     public static int botLevel = 0;
     private static int createConnect = ResID.CREATE;
 
@@ -47,35 +42,31 @@ public class TheTogyzQumalaq extends ApplicationAdapter {
     }
 
 
-    private static Music music;
-    private static Sound button;
+    private static Music oBackgroundMusic;
+    private static Sound oButtonSound;
 
-    public static boolean sound;
-    private static float volume;
+    public static boolean bPlaySound;
+    private static float fMusicVolume;
 
-    public static Music getMusic() {
-        return music;
+    public static Music getBackgroundMusic() {
+        return oBackgroundMusic;
     }
 
     public static Sound getButtonSound() {
-        return button;
+        return oButtonSound;
     }
 
-    public static BitmapFont getBitmapFont() {
-        return bitmapFont;
+    public static BitmapFont getMainFont() {
+        return oMainFont;
     }
 
-    public static BitmapFont getBitmapFontLil() {
-        return bitmapFontLil;
+    public static BitmapFont getSecondaryFont() {
+        return oSecondaryFont;
     }
 
     @Override
     public void create() {
         setParams();
-        GlyphLayout glyphLayout = new GlyphLayout();
-        glyphLayout.setText(bitmapFontLil, "►");
-
-
     }
 
     @Override
@@ -88,10 +79,10 @@ public class TheTogyzQumalaq extends ApplicationAdapter {
     @Override
     public void dispose() {
         batch.dispose();
-        music.dispose();
-        button.dispose();
-        bitmapFont.dispose();
-        bitmapFontLil.dispose();
+        oBackgroundMusic.dispose();
+        oButtonSound.dispose();
+        oMainFont.dispose();
+        oSecondaryFont.dispose();
     }
 
     public static FileHandle fileHandle;
@@ -101,56 +92,49 @@ public class TheTogyzQumalaq extends ApplicationAdapter {
         try {
             Scanner in = new Scanner(fileHandle.file());
             POSTFIX = in.nextLine();
-            sound = in.nextBoolean();
+            bPlaySound = in.nextBoolean();
             LANGUAGE = in.nextInt();
-            WORDS = ResID.WORDS[LANGUAGE];
+            LOCALE = ResID.DICTIONARY[LANGUAGE];
             botLevel = in.nextInt();
-            volume = in.nextInt() / 32f;
+            fMusicVolume = in.nextInt() / 32f;
             in.close();
         } catch (Exception ex) {
             POSTFIX = "taha";
-            sound = true;
-            WORDS = ResID.WORDS[0];
+            bPlaySound = true;
+            LOCALE = ResID.DICTIONARY[0];
             botLevel = 0;
-            volume = 0.1f;
+            fMusicVolume = 0.1f;
         }
     }
 
     public static void setParams() {
         batch = new SpriteBatch();
         gsm = new GameStateManager();
-        bitmapFont = new BitmapFont();
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(FILE_PATH));
-        FreeTypeFontGenerator generator2 = new FreeTypeFontGenerator(Gdx.files.internal(FILE_PATH2));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter2 = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.characters = CHAR_STRING;
-        parameter2.characters = CHAR_STRING;
-        parameter.size = 50;
-        parameter2.size = 50;
+
+        // Profile settings fetch
         loadProfile();
+
+        // Font settings
+        float fBorderWidth = 0;
         if (getIndexOfTheme() != 8 && getIndexOfTheme() != 9) {
-            parameter.borderWidth = 1.5f;
-            parameter2.borderWidth = 1.5f;
+            fBorderWidth = 1.5f;
         }
-        parameter.borderColor = new Color(0f, 0f, 0f, 1f);
-        parameter2.borderColor = new Color(0f, 0f, 0f, 1f);
-        bitmapFont = generator.generateFont(parameter);
-        parameter.size = 20;
-        bitmapFontLil = generator2.generateFont(parameter2);
+        Color oFontColor = ResID.COLORS[getIndexOfTheme()];
+        Color oBorderColor = new Color(0f, 0f, 0f, 1f);
+        oMainFont = FontManager.getFont("segoeui.ttf", 50, oFontColor, fBorderWidth, oBorderColor);
+        oSecondaryFont = FontManager.getFont("arial.ttf", 50, oFontColor, fBorderWidth, oBorderColor);
 
-        generator.dispose();
-        generator2.dispose();
-
-        bitmapFont.setColor(ResID.COLORS[getIndexOfTheme()]);
-        bitmapFontLil.setColor(ResID.COLORS[getIndexOfTheme()]);
-        System.out.println("MAIN!" + POSTFIX);
+        // Cleaning canvas
         Gdx.gl.glClearColor(1, 0, 0, 1);
-        music = Gdx.audio.newMusic(Gdx.files.internal(ResID.MUSIC + POSTFIX + ".mp3"));
-        button = Gdx.audio.newSound(Gdx.files.internal(ResID.BUTTON));
-        music.setVolume(volume);
-        music.setLooping(true);
-        if (sound) music.play();
+
+        // Music settings
+        oBackgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(ResID.MUSIC + POSTFIX + ".mp3"));
+        oButtonSound = Gdx.audio.newSound(Gdx.files.internal(ResID.BUTTON));
+        oBackgroundMusic.setVolume(fMusicVolume);
+        oBackgroundMusic.setLooping(true);
+        if (bPlaySound) oBackgroundMusic.play();
+
+        // Scene generation
         gsm.push(new MenuState(gsm, POSTFIX));
     }
 

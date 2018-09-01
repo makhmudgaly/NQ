@@ -4,10 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 
@@ -42,16 +40,16 @@ public class MenuState extends State implements InputProcessor {
         backAnimatino = false;
         offset = TheTogyzQumalaq.WIDTH * 0.56f;
         GlyphLayout glyphLayout = new GlyphLayout();
-        glyphLayout.setText(TheTogyzQumalaq.getBitmapFont(), TheTogyzQumalaq.WORDS[0]);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(), TheTogyzQumalaq.LOCALE[0]);
         wPvc = glyphLayout.width;
         glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getBitmapFont(), TheTogyzQumalaq.WORDS[1]);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(), TheTogyzQumalaq.LOCALE[1]);
         wPvp = glyphLayout.width;
         glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getBitmapFont(), TheTogyzQumalaq.WORDS[2]);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(), TheTogyzQumalaq.LOCALE[2]);
         wSettings = glyphLayout.width;
         glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getBitmapFont(), TheTogyzQumalaq.WORDS[18]);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(), TheTogyzQumalaq.LOCALE[18]);
         wTraining = glyphLayout.width;
         rectanglePvc = new Rectangle(TheTogyzQumalaq.WIDTH * 0.44f - boundX, 348f - boundY, wPvc + boundX * 2, 50f + boundY * 2);
         rectanglePvp = new Rectangle(TheTogyzQumalaq.WIDTH * 0.44f - boundX, 256f - boundY, wPvp + boundX * 2, 50f + boundY * 2);
@@ -75,19 +73,19 @@ public class MenuState extends State implements InputProcessor {
 
             if (rectanglePvc.contains(tmp.x, tmp.y)) {
                 backAnimatino = true;
-                if (TheTogyzQumalaq.sound) TheTogyzQumalaq.getButtonSound().play();
+                if (TheTogyzQumalaq.bPlaySound) TheTogyzQumalaq.getButtonSound().play();
                 selected = 0;
             } else if (rectanglePvp.contains(tmp.x, tmp.y)) {
                 backAnimatino = true;
-                if (TheTogyzQumalaq.sound) TheTogyzQumalaq.getButtonSound().play();
+                if (TheTogyzQumalaq.bPlaySound) TheTogyzQumalaq.getButtonSound().play();
                 selected = 1;
             } else if (rectangleSettings.contains(tmp.x, tmp.y)) {
                 backAnimatino = true;
-                if (TheTogyzQumalaq.sound) TheTogyzQumalaq.getButtonSound().play();
+                if (TheTogyzQumalaq.bPlaySound) TheTogyzQumalaq.getButtonSound().play();
                 selected = 2;
             } else if (rectangleTraining.contains(tmp.x, tmp.y)) {
                 backAnimatino = true;
-                if (TheTogyzQumalaq.sound) TheTogyzQumalaq.getButtonSound().play();
+                if (TheTogyzQumalaq.bPlaySound) TheTogyzQumalaq.getButtonSound().play();
                 selected = 3;
             }
         }
@@ -122,10 +120,10 @@ public class MenuState extends State implements InputProcessor {
         sb.setProjectionMatrix(camera.combined);
         sb.begin();
         sb.draw(background, 0, 0, TheTogyzQumalaq.WIDTH, TheTogyzQumalaq.HEIGHT);
-        TheTogyzQumalaq.getBitmapFont().draw(sb, TheTogyzQumalaq.WORDS[0], TheTogyzQumalaq.WIDTH * 0.44f + offset, 398f);
-        TheTogyzQumalaq.getBitmapFont().draw(sb, TheTogyzQumalaq.WORDS[1], TheTogyzQumalaq.WIDTH * 0.44f + offset, 306f);
-        TheTogyzQumalaq.getBitmapFont().draw(sb, TheTogyzQumalaq.WORDS[18], TheTogyzQumalaq.WIDTH * 0.44f + offset, 214f);
-        TheTogyzQumalaq.getBitmapFont().draw(sb, TheTogyzQumalaq.WORDS[2], TheTogyzQumalaq.WIDTH * 0.44f + offset, 122f);
+        TheTogyzQumalaq.getMainFont().draw(sb, TheTogyzQumalaq.LOCALE[0], TheTogyzQumalaq.WIDTH * 0.44f + offset, 398f);
+        TheTogyzQumalaq.getMainFont().draw(sb, TheTogyzQumalaq.LOCALE[1], TheTogyzQumalaq.WIDTH * 0.44f + offset, 306f);
+        TheTogyzQumalaq.getMainFont().draw(sb, TheTogyzQumalaq.LOCALE[18], TheTogyzQumalaq.WIDTH * 0.44f + offset, 214f);
+        TheTogyzQumalaq.getMainFont().draw(sb, TheTogyzQumalaq.LOCALE[2], TheTogyzQumalaq.WIDTH * 0.44f + offset, 122f);
         sb.end();
     }
 

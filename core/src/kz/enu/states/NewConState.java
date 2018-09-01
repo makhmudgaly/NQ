@@ -37,13 +37,13 @@ public class NewConState extends State implements InputProcessor {
         offset = TheTogyzQumalaq.WIDTH*0.56f;
         background = new Texture(ResID.MAIN_MENU + TheTogyzQumalaq.POSTFIX+".png");
         GlyphLayout glyphLayout = new GlyphLayout();
-        glyphLayout.setText(TheTogyzQumalaq.getBitmapFont(),TheTogyzQumalaq.WORDS[3]);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(),TheTogyzQumalaq.LOCALE[3]);
         wNew = glyphLayout.width;
         glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getBitmapFont(),TheTogyzQumalaq.WORDS[4]);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(),TheTogyzQumalaq.LOCALE[4]);
         wCon = glyphLayout.width;
         glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getBitmapFont(),TheTogyzQumalaq.WORDS[17]);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(),TheTogyzQumalaq.LOCALE[17]);
         wBack = glyphLayout.width;
         newRectangle = new Rectangle(TheTogyzQumalaq.WIDTH*0.44f-boundX,324f-boundY,wNew+boundX*2,50f+boundY*2);
         conRectangle = new Rectangle(TheTogyzQumalaq.WIDTH*0.44f-boundX,216f-boundY,wCon+boundX*2,50f+boundY*2);
@@ -58,15 +58,15 @@ public class NewConState extends State implements InputProcessor {
         if(Gdx.input.justTouched()) {
             if (newRectangle.contains(tmp.x, tmp.y)) {
                 backAnimatino = true;
-                if(TheTogyzQumalaq.sound)TheTogyzQumalaq.getButtonSound().play();
+                if(TheTogyzQumalaq.bPlaySound)TheTogyzQumalaq.getButtonSound().play();
                 selected = 0;
             }else if (conRectangle.contains(tmp.x, tmp.y)) {
                 backAnimatino = true;
-                if(TheTogyzQumalaq.sound)TheTogyzQumalaq.getButtonSound().play();
+                if(TheTogyzQumalaq.bPlaySound)TheTogyzQumalaq.getButtonSound().play();
                 selected = 1;
             }else if(backRectangle.contains(tmp.x,tmp.y)){
                 backAnimatino = true;
-                if(TheTogyzQumalaq.sound)TheTogyzQumalaq.getButtonSound().play();
+                if(TheTogyzQumalaq.bPlaySound)TheTogyzQumalaq.getButtonSound().play();
                 selected = 2;
             }
         }
@@ -90,9 +90,9 @@ public class NewConState extends State implements InputProcessor {
     public void render(SpriteBatch sb) {
         sb.begin();
             sb.draw(background,0,0, TheTogyzQumalaq.WIDTH,TheTogyzQumalaq.HEIGHT);
-            TheTogyzQumalaq.getBitmapFont().draw(sb,TheTogyzQumalaq.WORDS[3],TheTogyzQumalaq.WIDTH*0.44f+offset, 374f);
-            TheTogyzQumalaq.getBitmapFont().draw(sb,TheTogyzQumalaq.WORDS[4],TheTogyzQumalaq.WIDTH*0.44f+offset, 266f);
-            TheTogyzQumalaq.getBitmapFont().draw(sb,TheTogyzQumalaq.WORDS[17],TheTogyzQumalaq.WIDTH*0.44f+offset, 158f);
+            TheTogyzQumalaq.getMainFont().draw(sb,TheTogyzQumalaq.LOCALE[3],TheTogyzQumalaq.WIDTH*0.44f+offset, 374f);
+            TheTogyzQumalaq.getMainFont().draw(sb,TheTogyzQumalaq.LOCALE[4],TheTogyzQumalaq.WIDTH*0.44f+offset, 266f);
+            TheTogyzQumalaq.getMainFont().draw(sb,TheTogyzQumalaq.LOCALE[17],TheTogyzQumalaq.WIDTH*0.44f+offset, 158f);
         sb.end();
     }
 
@@ -106,7 +106,7 @@ public class NewConState extends State implements InputProcessor {
         if(keycode == Input.Keys.BACK){
             // Optional back button handling (e.g. ask for confirmation)
             backAnimatino = true;
-            if(TheTogyzQumalaq.sound)TheTogyzQumalaq.getButtonSound().play();
+            if(TheTogyzQumalaq.bPlaySound)TheTogyzQumalaq.getButtonSound().play();
             selected = 2;
             /*if (shouldReallyQuit)
                 Gdx.app.exit();*/

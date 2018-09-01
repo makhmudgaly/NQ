@@ -28,12 +28,12 @@ public class LoadingState extends State {
         black_bachground = new Texture(ResID.BLACK_BG);
         camera.setToOrtho(false, TheTogyzQumalaq.WIDTH,TheTogyzQumalaq.HEIGHT);
         GlyphLayout glyphLayout = new GlyphLayout();
-        glyphLayout.setText(TheTogyzQumalaq.getBitmapFont(),TheTogyzQumalaq.WORDS[14]);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(),TheTogyzQumalaq.LOCALE[14]);
         wLoading = glyphLayout.width;
         glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getBitmapFont(),"■■■■■■■■■■■■■■■");
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(),"■■■■■■■■■■■■■■■");
         wProgress = glyphLayout.width;
-        TheTogyzQumalaq.getBitmapFont().setColor(ResID.LOADING_COLORS[TheTogyzQumalaq.getIndexOfTheme()]);
+        TheTogyzQumalaq.getMainFont().setColor(ResID.LOADING_COLORS[TheTogyzQumalaq.getIndexOfTheme()]);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class LoadingState extends State {
         counter++;
         if(counter%7==0){progressBar+="■";points++;}
         if(points>15){
-            TheTogyzQumalaq.getBitmapFont().setColor(ResID.COLORS[TheTogyzQumalaq.getIndexOfTheme()]);
+            TheTogyzQumalaq.getMainFont().setColor(ResID.COLORS[TheTogyzQumalaq.getIndexOfTheme()]);
             gsm.set(new PlayState(gsm,mode,newCon));}
     }
 
@@ -54,8 +54,8 @@ public class LoadingState extends State {
     public void render(SpriteBatch sb) {
         sb.begin();
             sb.draw(black_bachground,0,0);
-            TheTogyzQumalaq.getBitmapFont().draw(sb,TheTogyzQumalaq.WORDS[14],(TheTogyzQumalaq.WIDTH-wLoading)/2,TheTogyzQumalaq.HEIGHT*0.2f);
-            TheTogyzQumalaq.getBitmapFont().draw(sb,progressBar,(TheTogyzQumalaq.WIDTH-wProgress)/2,TheTogyzQumalaq.HEIGHT*0.3f);
+            TheTogyzQumalaq.getMainFont().draw(sb,TheTogyzQumalaq.LOCALE[14],(TheTogyzQumalaq.WIDTH-wLoading)/2,TheTogyzQumalaq.HEIGHT*0.2f);
+            TheTogyzQumalaq.getMainFont().draw(sb,progressBar,(TheTogyzQumalaq.WIDTH-wProgress)/2,TheTogyzQumalaq.HEIGHT*0.3f);
         sb.end();
     }
 

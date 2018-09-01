@@ -61,12 +61,9 @@ public class ResID {
     public static String JACKPOT = "jackpot.mp3";
     public static String EFFECTIVE_MOVE = "effective.mp3";
     public static String ERROR = "error.mp3";
-    //Server
-    public static final String SERVER_URL = "http://y74744zy.beget.tech/php_login/nineq.php";
-    //"◄►"
 
 
-    public static final String[][] WORDS = {
+    public static final String[][] DICTIONARY = {
             //0               1              2           3            4           5           6            7              8        9         10           11       12              13              14         15               16        17      18          19          20       21                        22           23                          24             25
             {"SINGLE PLAYER", "MULTIPLAYER", "SETTINGS", "NEW GAME", "CONTINUE", "GAMEOVER", "Language:", "Difficulty:", "Level", "YOU WIN", "YOU LOSE", "DRAW", "PLAYER 1 WIN", "PLAYER 2 WIN", "LOADING", "THEME SETTINGS", "Music:", "BACK", "TRAINING", "INTERNET", "LOCAL", "WAITING FOR CONNECTION", "YOUR ID:", "Insert the opponent's ID", "CREATE GAME", "CONNECT TO GAME"},
             {"ОДИНОЧНАЯ ИГРА", "ДВА ИГРОКА", "НАСТРОЙКИ", "НОВАЯ ИГРА", "ПРОДОЛЖИТЬ", "КОНЕЦ", "Язык:", "Сложность:", "Уровень", "ВЫ ПОБЕДИЛИ", "ВЫ ПРОИГРАЛИ", "НИЧЬЯ", "ИГРОК 1 ПОБЕДИЛ", "ИГРОК 2 ПОБЕДИЛ", "ЗАГРУЗКА", "ВЫБОР ТЕМЫ", "Музыка:", "НАЗАД", "ОБУЧЕНИЕ", "ИНТЕРНЕТ", "ЛОКАЛЬНАЯ", "ЖДЕМ СОЕДИНЕНИЯ", "ВАШ ID:", "Введите ID противника", "СОЗДАТЬ ИГРУ", "ПРИСОДЕНИТЬСЯ"},
@@ -81,15 +78,4 @@ public class ResID {
     public static final Color[] INDEX_COLORS = {new Color(1f, 0.8f, 0.53f, 1f), new Color(0f, 1f, 0.99f, 1f), new Color(1f, 0f, 0f, 1f), new Color(0.1f, 1f, 0.1f, 1f), new Color(1f, 0.8f, 0f, 1f), new Color(0f, 0.153f, 0.173f, 1f), new Color(0.2f, 0.2f, 0.2f, 1f), new Color(0.35f, 0.6f, 1f, 1f)};
     public static final Color[] NUMBER_COLORS = {new Color(1f, 1f, 1f, 1f), new Color(1f, 1f, 1f, 1f), new Color(1f, 1f, 1f, 1f), new Color(1f, 1f, 1f, 1f), new Color(1f, 1f, 1f, 1f), new Color(0.6f, 0.2f, 0f, 1f), new Color(0.623f, 0.623f, 0.623f, 1f), new Color(1f, 1f, 1f, 1f)};
     public static final Color[] LOADING_COLORS = {new Color(1f, 0.8f, 0.53f, 1f), new Color(0f, 1f, 0.99f, 1f), new Color(1f, 0f, 0f, 1f), new Color(0.1f, 1f, 0.1f, 1f), new Color(1f, 0.8f, 0f, 1f), new Color(0f, 0.9f, 1f, 1f), new Color(0.623f, 0.623f, 0.623f, 1f), new Color(1f, 1f, 1f, 1f)};
-
-    public static Integer[] parseJSON(String json) {
-        json = json.substring(2, json.length() - 2);
-        String[] jsonArray = json.split(",");
-        Integer[] array = new Integer[jsonArray.length];
-        for (int i = 0; i < jsonArray.length; i++) {
-            jsonArray[i] = jsonArray[i].substring(jsonArray[i].indexOf(':') + 1);
-            array[i] = Integer.parseInt(jsonArray[i].substring(1, jsonArray[i].length() - 1));
-        }
-        return array;
-    }
 }

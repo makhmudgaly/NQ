@@ -3,7 +3,6 @@ package kz.enu.states;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -31,16 +30,16 @@ public class GameOver extends State {
         //wrapperTexture = new Texture(ResID.WRAPPER + TheTogyzQumalaq.POSTFIX+".png");
 
         win = Gdx.audio.newSound(Gdx.files.internal(ResID.WIN));
-        if (TheTogyzQumalaq.sound) win.play();
+        if (TheTogyzQumalaq.bPlaySound) win.play();
         //bitmapFont.getData().setScale(2f);
         camera.setToOrtho(false, TheTogyzQumalaq.WIDTH, TheTogyzQumalaq.HEIGHT);
         currentTime = 0;
         GlyphLayout glyphLayout = new GlyphLayout();
         String item = PlayState.getResult();
-        glyphLayout.setText(TheTogyzQumalaq.getBitmapFont(), item);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(), item);
         w = glyphLayout.width;
         glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getBitmapFont(), PlayState.getGameOverWords());
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(), PlayState.getGameOverWords());
         w1 = glyphLayout.width;
         //if (PlayState.getMode() == ResID.INTERNET) PlayState.getSocket().disconnect();
 
@@ -66,11 +65,11 @@ public class GameOver extends State {
         sb.begin();
         sb.draw(background, 0, 0, TheTogyzQumalaq.WIDTH, TheTogyzQumalaq.HEIGHT);
         //sb.draw(wrapperTexture,(TheTogyzQumalaq.WIDTH-wrapperTexture.getWidth())/2,290f);
-        TheTogyzQumalaq.getBitmapFont().draw(sb, PlayState.getGameOverWords(), (TheTogyzQumalaq.WIDTH - w1) / 2, 350f);
+        TheTogyzQumalaq.getMainFont().draw(sb, PlayState.getGameOverWords(), (TheTogyzQumalaq.WIDTH - w1) / 2, 350f);
         if (!PlayState.isTurn()) {
-            TheTogyzQumalaq.getBitmapFont().draw(sb, PlayState.getResult(), (TheTogyzQumalaq.WIDTH / 2) - (w / 2), TheTogyzQumalaq.HEIGHT / 2);
+            TheTogyzQumalaq.getMainFont().draw(sb, PlayState.getResult(), (TheTogyzQumalaq.WIDTH / 2) - (w / 2), TheTogyzQumalaq.HEIGHT / 2);
         } else {
-            TheTogyzQumalaq.getBitmapFont().draw(sb, PlayState.getResult(), (TheTogyzQumalaq.WIDTH / 2) - (w / 2), TheTogyzQumalaq.HEIGHT / 2);
+            TheTogyzQumalaq.getMainFont().draw(sb, PlayState.getResult(), (TheTogyzQumalaq.WIDTH / 2) - (w / 2), TheTogyzQumalaq.HEIGHT / 2);
         }
         sb.end();
     }
