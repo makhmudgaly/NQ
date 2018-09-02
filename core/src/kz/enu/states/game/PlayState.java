@@ -1,4 +1,4 @@
-package kz.enu.states;
+package kz.enu.states.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -17,19 +17,21 @@ import com.badlogic.gdx.math.Vector3;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
-import kz.enu.AI;
-import kz.enu.Registry;
 import kz.enu.TheTogyzQumalaq;
+import kz.enu.ai.AI;
+import kz.enu.system.Registry;
 import kz.enu.sprites.Board;
 import kz.enu.sprites.Slot;
 import kz.enu.sprites.StoneBank;
+import kz.enu.states.view.GameOver;
+import kz.enu.states.model.GameStateManager;
+import kz.enu.states.model.State;
+import kz.enu.states.view.MenuState;
 import kz.enu.system.FontManager;
 import kz.enu.system.Util;
 
@@ -37,6 +39,7 @@ import static kz.enu.TheTogyzQumalaq.bPlaySound;
 
 
 /**
+ * Main play state
  * Created by SLUX on 17.05.2017.
  */
 
@@ -51,10 +54,10 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
 
     private static Socket socket;
     private final static float UPDATE_TIME = 1 / 30f;
-    float timer = 0;
+    private float timer = 0;
 
     private static int GAME_MODE;
-    private static boolean isAnimationStarted;
+    private static boolean bAnimationStarted;
     private static boolean moveHasFinished;
     private static boolean amIFirst;
     private static int frameCounter = 0;
@@ -71,9 +74,6 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
 
     private static boolean turn;
     private static boolean isThinking;
-
-    public static int destination;
-    public static int source;
 
     private static ArrayList<Board> shots = new ArrayList<Board>();
 
@@ -120,9 +120,9 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
 
     private boolean isMoveTuzdykMaker = false;
     private boolean isAIMoveTuzdykMaker = false;
-    private boolean wasNoTuzdykAlready = true;
-    private boolean hasAIMakedMove = false;
-    private boolean hasIMakedMove = false;
+    private boolean bAIHasTuzdyk = false;
+    private boolean bAIMadeMove = false;
+    private boolean bPlayerMadeMove = false;
 
     private boolean isEffective = false;
 
@@ -130,7 +130,6 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
     private static float currentTime;
     private static float deltaTime;
 
-    private static Map possibleMoves = new HashMap<Integer, Integer>();
     private boolean sinteticMove;
     private static float wWaiting, wYourId;
 
@@ -169,10 +168,6 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         if (opponentID.equals("") && TheTogyzQumalaq.getCreateConnect() == Registry.CONNECT && GAME_MODE == Registry.INTERNET) {
             Gdx.input.getTextInput(this, TheTogyzQumalaq.LOCALE[23], "", "");
         }
-    }
-
-    public static boolean isTurn() {
-        return turn;
     }
 
     public static void setSlots(int[] slotCounter) {
@@ -260,7 +255,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         camera.setToOrtho(false, TheTogyzQumalaq.WIDTH, TheTogyzQumalaq.HEIGHT);
         sThinkingBar = "";
         fThinkingDuration = 0;
-        isAnimationStarted = false;
+        bAnimationStarted = false;
         isThinking = false;
 
         if (GAME_MODE == 0) {
@@ -398,7 +393,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
                         if (slots[i].isToched(camera)) {
                             sinteticMove = false;
                             move = slots[i].slotNumber;
-                            isAnimationStarted = true;
+                            bAnimationStarted = true;
                             if (slots[i].side == turn && slots[i].currentStonesNumber != 0)
                                 regShot();
                             logic();
@@ -411,7 +406,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
                     for (int i = 0; i < slots.length; i++) {
                         if (slots[i].isToched(camera)) {
                             move = slots[i].slotNumber;
-                            isAnimationStarted = true;
+                            bAnimationStarted = true;
                             if (slots[i].side == turn && slots[i].currentStonesNumber != 0)
                                 regShot();
                             logic();
@@ -428,8 +423,8 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
                         if (slots[i].isToched(camera)) {
 
                             move = slots[i].slotNumber;
-                            isAnimationStarted = true;
-                            hasIMakedMove = true;
+                            bAnimationStarted = true;
+                            bPlayerMadeMove = true;
                             if (slots[i].side == turn && slots[i].currentStonesNumber != 0)
                                 regShot();
                             logic();
@@ -442,38 +437,30 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
                 isThinking = true;
                 if (currentTime > DELAY) {
                     switch (TheTogyzQumalaq.botLevel) {
-                        case 0:
+                        case AI.EASY_AI:
                             move = AI.makeMoveEasyAI(slots);
-                            hasAIMakedMove = true;
-                            isAnimationStarted = true;
                             break;
-                        case 1:
-                            move = AI.makeMoveNormalAI(slots, possibleMoves);
-                            hasAIMakedMove = true;
-                            isAnimationStarted = true;
+                        case AI.NORMAL_AI:
+                            move = AI.makeMoveNormalAI(slots);
                             break;
-                        case 2:
-                            move = AI.makeMoveHardAI(slots, possibleMoves);
-                            hasAIMakedMove = true;
-                            isAnimationStarted = true;
+                        case AI.HARD_AI:
+                            move = AI.makeMoveHardAI(slots);
                             break;
-                        case 3:
+                        case AI.EFFECTIVE_AI:
                             move = AI.makeMoveEffectiveAI(slots);
-                            hasAIMakedMove = true;
-                            isAnimationStarted = true;
                             break;
                         default:
-                            move = AI.makeMoveNormalAI(slots, possibleMoves);
-                            hasAIMakedMove = true;
-                            isAnimationStarted = true;
+                            move = AI.makeMoveNormalAI(slots);
                     }
+                    bAIMadeMove = true;
+                    bAnimationStarted = true;
                     logic();
                     currentTime = 0;
                     printState();
-                    if (wasNoTuzdykAlready) for (int i = 0; i < 9; i++) {
+                    if (!bAIHasTuzdyk) for (int i = 0; i < 9; i++) {
                         if (slots[i].isTuzdyk) {
                             isAIMoveTuzdykMaker = true;
-                            wasNoTuzdykAlready = false;
+                            bAIHasTuzdyk = true;
                         }
                     }
                 }
@@ -510,7 +497,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         if (((!opponentID.equals("")) && GAME_MODE == Registry.INTERNET) || GAME_MODE == Registry.SINGLE_PLAYER || GAME_MODE == Registry.MULTIPLAYER)
             handleInput();
 
-        if (isAnimationStarted) {
+        if (bAnimationStarted) {
             for (int i = 0; i < slots.length; i++) {
                 slots[i].fadeStoneAnimation(1 / (float) slowness);
             }
@@ -520,7 +507,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
             frameCounter++;
         }
         if (frameCounter == slowness) {
-            isAnimationStarted = false;
+            bAnimationStarted = false;
             for (int i = 0; i < slots.length; i++) {
                 slots[i].fadeInAlpha = 0;
                 slots[i].fadeOutAlpha = 1;
@@ -718,18 +705,15 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         if (isAtsyrau()) {
             System.out.println("Atsyrau! U Lose");
             gsm.set(new GameOver(gsm));
-
         }
 
         lastSlotIndex = makeMove(move);
-        source = move;
 
         if (lastSlotIndex != -1) {
-            destination = lastSlotIndex;
             if (GAME_MODE == Registry.MULTIPLAYER || GAME_MODE == Registry.INTERNET) isMoveTuzdykMaker = false;
-            if (GAME_MODE == Registry.SINGLE_PLAYER && hasIMakedMove && isMoveTuzdykMaker)
+            if (GAME_MODE == Registry.SINGLE_PLAYER && bPlayerMadeMove && isMoveTuzdykMaker)
                 isMoveTuzdykMaker = false;
-            if (GAME_MODE == Registry.SINGLE_PLAYER && hasAIMakedMove && isAIMoveTuzdykMaker)
+            if (GAME_MODE == Registry.SINGLE_PLAYER && bAIMadeMove && isAIMoveTuzdykMaker)
                 isAIMoveTuzdykMaker = false;
             if (GAME_MODE == Registry.SINGLE_PLAYER && !turn) {
                 isThinking = false;
@@ -775,8 +759,8 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
             flag = false;
         }
 
-        if (hasAIMakedMove) hasAIMakedMove = false;
-        if (hasIMakedMove) hasIMakedMove = false;
+        if (bAIMadeMove) bAIMadeMove = false;
+        if (bPlayerMadeMove) bPlayerMadeMove = false;
         turn ^= true;
     }
 
@@ -857,7 +841,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
 
         if (tmp.equals("true")) turn = true;
         else if (tmp.equals("false")) turn = false;
-        isAnimationStarted = true;
+        bAnimationStarted = true;
         in.close();
     }
 
@@ -931,14 +915,14 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
                     slots[i].texture = slotTexture;
                     slots[i].isTuzdyk = false;
                     isAIMoveTuzdykMaker = false;
-                    wasNoTuzdykAlready = true;
+                    bAIHasTuzdyk = false;
                 }
             }
         }
         try {
             shots.get(shots.size() - 1).getShot(this);
             shots.remove(shots.size() - 1);
-            isAnimationStarted = true;
+            bAnimationStarted = true;
 
         } catch (ArrayIndexOutOfBoundsException aiEx) {
             if (bPlaySound) error.play();
@@ -1002,7 +986,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
             public void call(Object... args) {
                 sinteticMove = true;
                 move = (Integer) args[0];
-                isAnimationStarted = true;
+                bAnimationStarted = true;
                 logic();
                 printState();
             }

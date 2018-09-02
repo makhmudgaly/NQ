@@ -13,26 +13,24 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.Scanner;
 
-import kz.enu.states.GameStateManager;
-import kz.enu.states.MenuState;
-import kz.enu.system.FontManager;
-import kz.enu.system.Util;
+import kz.enu.states.model.GameStateManager;
+import kz.enu.states.view.MenuState;
+import kz.enu.system.*;
 
-public class TheTogyzQumalaq extends ApplicationAdapter {
-
-
+public class TheTogyzQumalaq extends ApplicationAdapter
+{
     public static final int WIDTH = 900;
     public static final int HEIGHT = 540;
     public static final String TITLE = "Nine";
     public static String POSTFIX;
-    public static int LANGUAGE;
+    private static int LANGUAGE;
     private static BitmapFont oMainFont;
     private static BitmapFont oSecondaryFont;
     private static GameStateManager gsm;
     private static SpriteBatch batch;
     public static String[] LOCALE;
     public static int botLevel = 0;
-    private static int createConnect = Registry.CREATE;
+    private static int createConnect = kz.enu.system.Registry.CREATE;
 
     public static int getCreateConnect() {
         return createConnect;
@@ -86,29 +84,27 @@ public class TheTogyzQumalaq extends ApplicationAdapter {
         oSecondaryFont.dispose();
     }
 
-    public static FileHandle fileHandle;
-
-    public static void loadProfile() {
-        fileHandle = Gdx.files.local("profile.txt");
+    private static void loadProfile() {
+        FileHandle fileHandle = Gdx.files.local("profile.txt");
         try {
             Scanner in = new Scanner(fileHandle.file());
             POSTFIX = in.nextLine();
             bPlaySound = in.nextBoolean();
             LANGUAGE = in.nextInt();
-            LOCALE = Registry.DICTIONARY[LANGUAGE];
+            LOCALE = kz.enu.system.Registry.DICTIONARY[LANGUAGE];
             botLevel = in.nextInt();
             fMusicVolume = in.nextInt() / 32f;
             in.close();
         } catch (Exception ex) {
             POSTFIX = "taha";
             bPlaySound = true;
-            LOCALE = Registry.DICTIONARY[0];
+            LOCALE = kz.enu.system.Registry.DICTIONARY[0];
             botLevel = 0;
             fMusicVolume = 0.1f;
         }
     }
 
-    public static void setParams() {
+    private static void setParams() {
         batch = new SpriteBatch();
         gsm = new GameStateManager();
 
@@ -120,7 +116,7 @@ public class TheTogyzQumalaq extends ApplicationAdapter {
         if (getIndexOfTheme() != 8 && getIndexOfTheme() != 9) {
             fBorderWidth = 1.5f;
         }
-        Color oFontColor = Registry.COLORS[getIndexOfTheme()];
+        Color oFontColor = kz.enu.system.Registry.COLORS[getIndexOfTheme()];
         Color oBorderColor = new Color(0f, 0f, 0f, 1f);
         oMainFont = FontManager.getFont("segoeui.ttf", 50, oFontColor, fBorderWidth, oBorderColor, false);
         oSecondaryFont = FontManager.getFont("arial.ttf", 50, oFontColor, fBorderWidth, oBorderColor, false);
@@ -136,8 +132,8 @@ public class TheTogyzQumalaq extends ApplicationAdapter {
     }
 
     private static void loadMusic() {
-        oBackgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(Registry.MUSIC + POSTFIX + ".mp3"));
-        oButtonSound = Util.getSound(Registry.BUTTON);
+        oBackgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(kz.enu.system.Registry.MUSIC + POSTFIX + ".mp3"));
+        oButtonSound = Util.getSound(kz.enu.system.Registry.BUTTON);
         oBackgroundMusic.setVolume(fMusicVolume);
         oBackgroundMusic.setLooping(true);
         if (bPlaySound) oBackgroundMusic.play();
@@ -149,8 +145,8 @@ public class TheTogyzQumalaq extends ApplicationAdapter {
     }
 
     public static int getIndexOfTheme() {
-        for (int i = 0; i < Registry.skinsList.length; i++) {
-            if (POSTFIX.equals(Registry.skinsList[i])) return i;
+        for (int i = 0; i < kz.enu.system.Registry.skinsList.length; i++) {
+            if (POSTFIX.equals(kz.enu.system.Registry.skinsList[i])) return i;
         }
         return -1;
     }

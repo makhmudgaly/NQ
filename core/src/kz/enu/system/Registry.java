@@ -1,4 +1,4 @@
-package kz.enu;
+package kz.enu.system;
 
 
 import com.badlogic.gdx.graphics.Color;

@@ -1,4 +1,4 @@
-package kz.enu.states;
+package kz.enu.states.view.menu;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -9,15 +9,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 
-import kz.enu.Registry;
 import kz.enu.TheTogyzQumalaq;
+import kz.enu.system.Registry;
+import kz.enu.states.view.*;
+import kz.enu.states.view.LoadingState;
 import kz.enu.system.Util;
 
 /**
  * Created by SLUX on 02.07.2017.
  */
 
-public class CreateConnectState extends State implements InputProcessor {
+public class CreateConnectState extends kz.enu.states.model.State implements InputProcessor {
 
     private static int GAME_MODE;
     private Texture background;
@@ -27,12 +29,12 @@ public class CreateConnectState extends State implements InputProcessor {
 
     private boolean backAnimatino;
     private int selected;
-    static float offset;
-    float wCreate, wConnect, wBack;
+    private static float offset;
     private static final float boundX = 10f, boundY = 10f;
 
-    public CreateConnectState(GameStateManager gsm, int mode) {
+    public CreateConnectState(kz.enu.states.model.GameStateManager gsm, int mode) {
         super(gsm);
+        float wCreate, wConnect, wBack;
         GAME_MODE = mode;
         Gdx.input.setInputProcessor(this);
         Gdx.input.setCatchBackKey(true);
@@ -87,7 +89,7 @@ public class CreateConnectState extends State implements InputProcessor {
             switch (selected) {
                 case 0: {
                     TheTogyzQumalaq.setCreateConnect(Registry.CREATE);
-                    gsm.set(new LoadingState(gsm, Registry.INTERNET, false));
+                    gsm.set(new kz.enu.states.view.LoadingState(gsm, Registry.INTERNET, false));
                 }
                 break;
                 case 1: {

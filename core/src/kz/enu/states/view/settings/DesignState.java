@@ -1,4 +1,4 @@
-package kz.enu.states;
+package kz.enu.states.view.settings;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -15,22 +15,27 @@ import com.badlogic.gdx.utils.Array;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
-import kz.enu.Registry;
 import kz.enu.TheTogyzQumalaq;
+import kz.enu.system.Registry;
+import kz.enu.states.model.GameStateManager;
+import kz.enu.states.model.State;
+import kz.enu.states.model.ThemePreview;
+import kz.enu.states.view.MenuState;
 import kz.enu.system.Util;
 
-import static kz.enu.Registry.skinsList;
-import static kz.enu.TheTogyzQumalaq.botLevel;
+import static kz.enu.system.Registry.skinsList;
 import static kz.enu.TheTogyzQumalaq.bPlaySound;
+import static kz.enu.TheTogyzQumalaq.botLevel;
 
 /**
+ * Inner design theme setting
  * Created by SLUX on 27.06.2017.
  */
 
 public class DesignState extends State implements InputProcessor {
     private float alpha;
     private Texture bg;
-    private Array<Example> examples = new Array<Example>();
+    private Array<ThemePreview> examples = new Array<ThemePreview>();
     private PrintWriter pw;
     public static FileHandle fileHandle;
     private static int selectedTheme;
@@ -56,7 +61,7 @@ public class DesignState extends State implements InputProcessor {
     private Rectangle themeRightArrowRectangle;
     GlyphLayout glyphLayout = new GlyphLayout();
     float wOK,wSkinName,wBack;
-    public DesignState(GameStateManager gsm,int selectedLanguage) {
+    public DesignState(GameStateManager gsm, int selectedLanguage) {
         super(gsm);
         Gdx.input.setInputProcessor(this);
         Gdx.input.setCatchBackKey(true);
@@ -68,7 +73,7 @@ public class DesignState extends State implements InputProcessor {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        selectedTheme = TheTogyzQumalaq.getIndexOfTheme() + 1;
+        selectedTheme = TheTogyzQumalaq.getIndexOfTheme()/* + 1*/;
         initTextureArray();
 
         glyphLayout.setText(TheTogyzQumalaq.getMainFont(),"OK");
@@ -77,7 +82,7 @@ public class DesignState extends State implements InputProcessor {
         glyphLayout.setText(TheTogyzQumalaq.getMainFont(), Registry.SKINS_NAME[selectedLanguage][selectedTheme]);
         wSkinName = glyphLayout.width;
         glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getMainFont(),TheTogyzQumalaq.LOCALE[17]);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(), TheTogyzQumalaq.LOCALE[17]);
         wBack = glyphLayout.width;
         homeTexture = Util.getTexture(Registry.HOME);
         soundOnTexture = Util.getTexture(Registry.SOUND);
@@ -98,7 +103,7 @@ public class DesignState extends State implements InputProcessor {
 
         themeLeftArrowRectangle = new Rectangle(100f,260f,63f,70f);
         themeRightArrowRectangle = new Rectangle(740f,260f,63f,70f);
-        camera.setToOrtho(false, TheTogyzQumalaq.WIDTH,TheTogyzQumalaq.HEIGHT);
+        camera.setToOrtho(false, TheTogyzQumalaq.WIDTH, TheTogyzQumalaq.HEIGHT);
 
     }
 
@@ -106,7 +111,7 @@ public class DesignState extends State implements InputProcessor {
 
         for(int i = 0; i< skinsList.length; i++){
             //if(i%4==0){y = 540f;j++;}
-            examples.add(new Example(175f,135f,new Texture("example_"+skinsList[i]+".png")));
+            examples.add(new ThemePreview(175f,135f,new Texture("example_"+skinsList[i]+".png")));
         }
     }
     @Override
@@ -118,18 +123,18 @@ public class DesignState extends State implements InputProcessor {
             if(acceptRectangle.contains(tmp.x,tmp.y)){
                 accept();
             }else if(backRectangle.contains(tmp.x,tmp.y)){
-                if(TheTogyzQumalaq.bPlaySound)TheTogyzQumalaq.getButtonSound().play();
+                if(TheTogyzQumalaq.bPlaySound) TheTogyzQumalaq.getButtonSound().play();
                 gsm.set(new SettingState(gsm));}
             else if(themeLeftArrowRectangle.contains(tmp.x,tmp.y)){
                 if(selectedTheme>0)selectedTheme--;
                 else selectedTheme = skinsList.length-1;
-                if(TheTogyzQumalaq.bPlaySound)TheTogyzQumalaq.getButtonSound().play();
+                if(TheTogyzQumalaq.bPlaySound) TheTogyzQumalaq.getButtonSound().play();
             }else if(themeRightArrowRectangle.contains(tmp.x,tmp.y)){
                 if(selectedTheme<skinsList.length-1)selectedTheme++;
                 else selectedTheme = 0;
                 TheTogyzQumalaq.getButtonSound().play();
             }else if(homeRectangle.contains(tmp.x,tmp.y)){
-                gsm.set(new MenuState(gsm,TheTogyzQumalaq.POSTFIX));
+                gsm.set(new MenuState(gsm, TheTogyzQumalaq.POSTFIX));
             }else if(soundRectangle.contains(tmp.x,tmp.y)){
                 if(bPlaySound){
                     bPlaySound = false;
@@ -154,7 +159,7 @@ public class DesignState extends State implements InputProcessor {
         pw.println((int)(TheTogyzQumalaq.getBackgroundMusic().getVolume()*32));
         pw.flush();
         new TheTogyzQumalaq().reboot();
-        gsm.set(new MenuState(gsm,TheTogyzQumalaq.POSTFIX));
+        gsm.set(new MenuState(gsm, TheTogyzQumalaq.POSTFIX));
     }
 
     @Override
@@ -172,7 +177,7 @@ public class DesignState extends State implements InputProcessor {
     @Override
     public void render(SpriteBatch sb) {
         sb.begin();
-        sb.draw(bg,0,0, TheTogyzQumalaq.WIDTH,TheTogyzQumalaq.HEIGHT);
+        sb.draw(bg,0,0, TheTogyzQumalaq.WIDTH, TheTogyzQumalaq.HEIGHT);
         sb.draw(wrapperTexture,734f,33f);
         sb.draw(wrapperTexture,wBack+40f-wrapperTexture.getWidth(),33f);
         //bitmapFont.draw(sb,"In development process. . .\nTouch to go back",TheTogyzQumalaq.WIDTH/2,TheTogyzQumalaq.HEIGHT/2);
@@ -182,7 +187,7 @@ public class DesignState extends State implements InputProcessor {
         TheTogyzQumalaq.getSecondaryFont().draw(sb, Registry.RIGTH_ARROW,750f,320f);
         TheTogyzQumalaq.getMainFont().draw(sb, Registry.SKINS_NAME[selectedLanguage][selectedTheme],(TheTogyzQumalaq.WIDTH-wSkinName)/2,90f);
         TheTogyzQumalaq.getMainFont().draw(sb,"OK",754,90f);
-        TheTogyzQumalaq.getMainFont().draw(sb,TheTogyzQumalaq.LOCALE[17],20f,90f);
+        TheTogyzQumalaq.getMainFont().draw(sb, TheTogyzQumalaq.LOCALE[17],20f,90f);
         sb.draw(homeTexture,822f,475f);
         sb.draw(soundTexture,822f,410f);
         if(alpha>0) {
@@ -208,7 +213,7 @@ public class DesignState extends State implements InputProcessor {
     public boolean keyDown(int keycode) {
         if(keycode == Input.Keys.BACK){
             // Optional back button handling (e.g. ask for confirmation)
-            gsm.set(new MenuState(gsm,TheTogyzQumalaq.POSTFIX));
+            gsm.set(new MenuState(gsm, TheTogyzQumalaq.POSTFIX));
             /*if (shouldReallyQuit)
                 Gdx.app.exit();*/
         }
@@ -268,22 +273,5 @@ public class DesignState extends State implements InputProcessor {
     @Override
     public boolean scrolled(int amount) {
         return false;
-    }
-}
-
-class Example{
-    public Texture texture;
-    public Rectangle rectangle;
-    public float x;
-    public float y;
-    public Example(float x,float y,Texture texture){
-        this.x = x;
-        this.y = y;
-        this.texture = texture;
-        this.rectangle = new Rectangle(x,y,texture.getWidth(),texture.getHeight());
-    }
-
-    public void glow(SpriteBatch sb,Texture glowTexture){
-        sb.draw(glowTexture,this.x-7,this.y-7);
     }
 }

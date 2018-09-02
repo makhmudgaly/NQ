@@ -1,4 +1,4 @@
-package kz.enu.states;
+package kz.enu.states.game;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  * Created by SLUX on 30.06.2017.
  */
 
-public class TrainingState extends State {
-    public TrainingState(GameStateManager gsm) {
+public class TrainingState extends kz.enu.states.model.State {
+    public TrainingState(kz.enu.states.model.GameStateManager gsm) {
         super(gsm);
     }
 

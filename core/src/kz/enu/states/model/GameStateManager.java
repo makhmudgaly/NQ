@@ -1,4 +1,4 @@
-package kz.enu.states;
+package kz.enu.states.model;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -8,15 +8,15 @@ import java.util.Stack;
  * Created by SLUX on 17.05.2017.
  */
 
-public class GameStateManager {
+public final class GameStateManager {
 
-    private Stack<State> states;
+    private Stack<kz.enu.states.model.State> states;
 
     public GameStateManager(){
-        states = new Stack<State>();
+        states = new Stack<kz.enu.states.model.State>();
     }
 
-    public void push(State state){
+    public void push(kz.enu.states.model.State state){
         states.push(state);
     }
 
@@ -24,7 +24,7 @@ public class GameStateManager {
         states.pop().dispose();
     }
 
-    public void set(State state){
+    public void set(kz.enu.states.model.State state){
         states.pop().dispose();
         states.push(state);
     }

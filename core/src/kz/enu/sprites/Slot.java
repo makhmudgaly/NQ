@@ -10,8 +10,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 
-import kz.enu.states.PlayState;
-
 /**
  * Created by SLUX on 29.05.2017.
  */
