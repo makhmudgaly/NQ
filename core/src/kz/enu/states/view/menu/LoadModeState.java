@@ -19,7 +19,7 @@ import kz.enu.system.Util;
  * Created by SLUX on 07.06.2017.
  */
 
-public class NewConState extends kz.enu.states.model.State implements InputProcessor {
+public class LoadModeState extends kz.enu.states.model.State implements InputProcessor {
     private static int GAME_MODE;
     private Texture background;
     private Rectangle newRectangle;
@@ -31,7 +31,7 @@ public class NewConState extends kz.enu.states.model.State implements InputProce
     static float offset ;
     float wNew,wCon,wBack;
     private static final float boundX = 10f,boundY=10f;
-    public NewConState(kz.enu.states.model.GameStateManager gsm, int mode) {
+    public LoadModeState(kz.enu.states.model.GameStateManager gsm, int mode) {
         super(gsm);
         GAME_MODE = mode;
         Gdx.input.setInputProcessor(this);
@@ -85,7 +85,7 @@ public class NewConState extends kz.enu.states.model.State implements InputProce
         handleInput();
         if(offset>= TheTogyzQumalaq.WIDTH*0.8f&&backAnimatino) {
             switch (selected) {
-                case 0:gsm.set(new kz.enu.states.view.LoadingState(gsm, GAME_MODE,false));break;
+                case 0:gsm.set(new LoadingState(gsm, GAME_MODE,false));break;
                 case 1:gsm.set(new LoadingState(gsm, GAME_MODE,true));break;
                 case 2:gsm.set(new MenuState(gsm, TheTogyzQumalaq.POSTFIX));break;
             }

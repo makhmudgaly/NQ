@@ -18,7 +18,7 @@ import kz.enu.system.Util;
  * Created by SLUX on 02.07.2017.
  */
 
-public class InterLocalState extends kz.enu.states.model.State implements InputProcessor {
+public class MultiplayerModeState extends kz.enu.states.model.State implements InputProcessor {
 
     private static int GAME_MODE;
     private Texture background;
@@ -31,7 +31,7 @@ public class InterLocalState extends kz.enu.states.model.State implements InputP
     private static float offset;
     private static final float boundX = 10f, boundY = 10f;
 
-    public InterLocalState(kz.enu.states.model.GameStateManager gsm, int mode) {
+    public MultiplayerModeState(kz.enu.states.model.GameStateManager gsm, int mode) {
         super(gsm);
         float wNet, wLocal, wBack;
         GAME_MODE = mode;
@@ -90,7 +90,7 @@ public class InterLocalState extends kz.enu.states.model.State implements InputP
                     gsm.set(new CreateConnectState(gsm, 0));
                     break;
                 case 1:
-                    gsm.set(new NewConState(gsm, GAME_MODE));
+                    gsm.set(new LoadModeState(gsm, GAME_MODE));
                     break;
                 case 2:
                     gsm.set(new MenuState(gsm, TheTogyzQumalaq.POSTFIX));
@@ -121,8 +121,6 @@ public class InterLocalState extends kz.enu.states.model.State implements InputP
             bBackAnimation = true;
             if (TheTogyzQumalaq.bPlaySound) TheTogyzQumalaq.getButtonSound().play();
             selected = 2;
-            /*if (shouldReallyQuit)
-                Gdx.app.exit();*/
         }
         return false;
     }

@@ -12,8 +12,8 @@ import com.badlogic.gdx.math.Vector3;
 import kz.enu.TheTogyzQumalaq;
 import kz.enu.system.Registry;
 import kz.enu.states.model.GameStateManager;
-import kz.enu.states.view.menu.InterLocalState;
-import kz.enu.states.view.menu.NewConState;
+import kz.enu.states.view.menu.MultiplayerModeState;
+import kz.enu.states.view.menu.LoadModeState;
 import kz.enu.states.model.State;
 import kz.enu.states.view.settings.SettingState;
 import kz.enu.system.Util;
@@ -105,10 +105,10 @@ public class MenuState extends State implements InputProcessor {
         if (offset >= TheTogyzQumalaq.WIDTH * 0.8f && backAnimatino) {
             switch (selected) {
                 case 0:
-                    gsm.set(new NewConState(gsm, 0));
+                    gsm.set(new LoadModeState(gsm, 0));
                     break;
                 case 1:
-                    gsm.set(new InterLocalState(gsm, 1));
+                    gsm.set(new MultiplayerModeState(gsm, 1));
                     break;
                 case 2:
                     gsm.set(new SettingState(gsm));

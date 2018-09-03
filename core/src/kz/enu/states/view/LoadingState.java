@@ -15,7 +15,7 @@ public class LoadingState extends kz.enu.states.model.State {
     private Texture oBlackBackground;
     private int GAME_MODE;
     private boolean IS_NEW_GAME;
-    private static int counter,points;
+    private static int counter;
     private static String progressBar;
     private float wLoading,wProgress;
 
@@ -24,7 +24,6 @@ public class LoadingState extends kz.enu.states.model.State {
         GAME_MODE = mode;
         IS_NEW_GAME = isNewGame;
         counter = 0;
-        points = 0;
         progressBar = "";
         oBlackBackground = new Texture(Registry.BLACK_BG);
         camera.setToOrtho(false, TheTogyzQumalaq.WIDTH, TheTogyzQumalaq.HEIGHT);
@@ -45,10 +44,26 @@ public class LoadingState extends kz.enu.states.model.State {
     @Override
     public void update(float dt) {
         counter++;
-        if(counter%7==0){progressBar+="■";points++;}
-        if(points>15){
+        if(counter % 7 == 0){ progressBar+="■"; }
+        if(progressBar.length() >15) {
             TheTogyzQumalaq.getMainFont().setColor(Registry.COLORS[TheTogyzQumalaq.getIndexOfTheme()]);
-            gsm.set(new kz.enu.states.game.PlayState(gsm, GAME_MODE, IS_NEW_GAME));}
+            // Rendering corresponding game state
+            switch (GAME_MODE) {
+                case Registry.SINGLE_PLAYER:
+                    gsm.set(new kz.enu.states.game.SinglePlayerGame(gsm, GAME_MODE, IS_NEW_GAME));
+                    break;
+                case Registry.MULTIPLAYER:
+                    gsm.set(new kz.enu.states.game.MultiplayerLocalGame(gsm, GAME_MODE, IS_NEW_GAME));
+                    break;
+                case Registry.INTERNET:
+                    gsm.set(new kz.enu.states.game.MultiplayerInternetGame(gsm, GAME_MODE, IS_NEW_GAME));
+                    break;
+                case Registry.TUTORIAL:
+                    gsm.set(new kz.enu.states.game.TrainingState(gsm));
+                    break;
+            }
+        }
+
     }
 
     @Override

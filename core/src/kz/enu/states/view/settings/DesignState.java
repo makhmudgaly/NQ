@@ -37,7 +37,6 @@ public class DesignState extends State implements InputProcessor {
     private Texture bg;
     private Array<ThemePreview> examples = new Array<ThemePreview>();
     private PrintWriter pw;
-    public static FileHandle fileHandle;
     private static int selectedTheme;
     private static int selectedLanguage;
     private Texture homeTexture;
@@ -47,7 +46,6 @@ public class DesignState extends State implements InputProcessor {
     private Texture exampleOutglow;
     private Texture wrapperTexture;
     private int oldX = 0;
-    private int newX = 0;
 
     private static Sprite blackSprite;
 
@@ -67,13 +65,13 @@ public class DesignState extends State implements InputProcessor {
         Gdx.input.setCatchBackKey(true);
         this.selectedLanguage = selectedLanguage;
         bg = Util.getTexture(Registry.BACKGROUND);
-        fileHandle = Gdx.files.local("profile.txt");
+        FileHandle fileHandle = Gdx.files.local("profile.txt");
         try {
             pw = new PrintWriter(fileHandle.file());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        selectedTheme = TheTogyzQumalaq.getIndexOfTheme()/* + 1*/;
+        selectedTheme = (TheTogyzQumalaq.getIndexOfTheme() + 1) % Registry.skinsList.length;
         initTextureArray();
 
         glyphLayout.setText(TheTogyzQumalaq.getMainFont(),"OK");
@@ -243,7 +241,7 @@ public class DesignState extends State implements InputProcessor {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        newX = screenX;
+        int newX = screenX;
         Vector3 tmp = new Vector3(Gdx.input.getX(),Gdx.input.getY(),0);
         camera.unproject(tmp);
         if(exampleRectangle.contains(tmp.x,tmp.y))

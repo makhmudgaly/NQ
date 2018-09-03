@@ -45,7 +45,6 @@ import static kz.enu.TheTogyzQumalaq.bPlaySound;
 
 public class PlayState extends State implements InputProcessor, Input.TextInputListener {
 
-    private boolean flag;
     private static String opponentID = "";
     private static String myID = "";
 
@@ -59,7 +58,6 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
     private static int GAME_MODE;
     private static boolean bAnimationStarted;
     private static boolean moveHasFinished;
-    private static boolean amIFirst;
     private static int frameCounter = 0;
     private final static int slowness = 20;
 
@@ -146,13 +144,12 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
 
         if (IS_NEW_GAME)
             try {
-                sartFile();
-            } catch (FileNotFoundException fnfe) {}
+                loadSavedFile();
+            } catch (FileNotFoundException fnfe) {
+            }
         else {
             turn = true;
         }
-        amIFirst = true;
-        flag = true;
         if (GAME_MODE == Registry.INTERNET) {
             connectSocket();
             configSocketEvents();
@@ -250,17 +247,16 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         }
     }
 
-    private void initVariables()
-    {
+    private void initVariables() {
         camera.setToOrtho(false, TheTogyzQumalaq.WIDTH, TheTogyzQumalaq.HEIGHT);
         sThinkingBar = "";
         fThinkingDuration = 0;
         bAnimationStarted = false;
         isThinking = false;
 
-        if (GAME_MODE == 0) {
+        if (GAME_MODE == Registry.SINGLE_PLAYER) {
             sSaveFile = "saveAI.txt";
-        } else if (GAME_MODE == 1) {
+        } else if (GAME_MODE == Registry.MULTIPLAYER) {
             sSaveFile = "save.txt";
         }
     }
@@ -331,7 +327,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
 
         // Ice cream fonts
         Color oIceCreamColor = Registry.INDEX_COLORS[TheTogyzQumalaq.getIndexOfTheme()];
-        oIceCreamFont = FontManager.getFont(FONT_PATH, FONT_SIZE, oIceCreamColor,fBorderWidth, oBorderColor, false);
+        oIceCreamFont = FontManager.getFont(FONT_PATH, FONT_SIZE, oIceCreamColor, fBorderWidth, oBorderColor, false);
         oIceCreamFontFlipped = FontManager.getFont(FONT_PATH, FONT_SIZE, oIceCreamColor, fBorderWidth, oBorderColor, true);
         oIceCreamFontFlipped.getData().setScale(-1, 1);
 
@@ -533,13 +529,11 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         sb.draw(bg, 0, 0);
         if (((!opponentID.equals("")) && GAME_MODE == Registry.INTERNET) || GAME_MODE == Registry.SINGLE_PLAYER || GAME_MODE == Registry.MULTIPLAYER) {
             for (int i = 0; i < slots.length; i++) {
-                //slots[i].resetStonesAlpha();
                 if (!slots[i].isTuzdyk)
                     sb.draw(slots[i].texture, slots[i].x, slots[i].y);
                 else {
                     sb.draw(tuzdykTexture, slots[i].x, slots[i].y);
                 }
-
 
                 slots[i].drawStones(sb);
 
@@ -614,7 +608,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         turnUpTexture.dispose();
     }
 
-    public static void printState() {
+    private static void printState() {
         if (turn) System.out.println("Turn of First Player!");
         else System.out.println("Turn of Second Player!");
 
@@ -686,7 +680,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
 
         } else {
             turn ^= true;
-            if (bPlaySound && (GAME_MODE == Registry.SINGLE_PLAYER && !turn || (GAME_MODE == Registry.MULTIPLAYER || GAME_MODE == Registry.INTERNET)))
+            if (bPlaySound && ((GAME_MODE == Registry.SINGLE_PLAYER && !turn) || (GAME_MODE == Registry.MULTIPLAYER || GAME_MODE == Registry.INTERNET)))
                 error.play();
             return -1;
         }
@@ -710,7 +704,8 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         lastSlotIndex = makeMove(move);
 
         if (lastSlotIndex != -1) {
-            if (GAME_MODE == Registry.MULTIPLAYER || GAME_MODE == Registry.INTERNET) isMoveTuzdykMaker = false;
+            if (GAME_MODE == Registry.MULTIPLAYER || GAME_MODE == Registry.INTERNET)
+                isMoveTuzdykMaker = false;
             if (GAME_MODE == Registry.SINGLE_PLAYER && bPlayerMadeMove && isMoveTuzdykMaker)
                 isMoveTuzdykMaker = false;
             if (GAME_MODE == Registry.SINGLE_PLAYER && bAIMadeMove && isAIMoveTuzdykMaker)
@@ -722,7 +717,8 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
 
                 if (slots[lastSlotIndex].currentStonesNumber % 2 == 0) {
 
-                    if (slots[lastSlotIndex].currentStonesNumber >= 16 && bPlaySound) jackpot.play();
+                    if (slots[lastSlotIndex].currentStonesNumber >= 16 && bPlaySound)
+                        jackpot.play();
 
                     stoneBanks[turn ? 0 : 1].currentStonesNumber += slots[lastSlotIndex].currentStonesNumber;
 
@@ -756,7 +752,6 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
                 }
             isEffective = false;
             moveHasFinished = true;
-            flag = false;
         }
 
         if (bAIMadeMove) bAIMadeMove = false;
@@ -861,7 +856,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
 
     }
 
-    private static void sartFile() throws FileNotFoundException {
+    private static void loadSavedFile() throws FileNotFoundException {
         if (fileHandle.file().exists()) {
             loadGame();
         }
@@ -949,7 +944,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         return b;
     }
 
-   public static void connectSocket() {
+    public static void connectSocket() {
         try {
             socket = IO.socket("https://togyz.herokuapp.com");
             //socket = IO.socket("http://localhost:3000");
@@ -977,9 +972,6 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
             public void call(Object... args) {
                 String id = args[0].toString();
                 Gdx.app.log("SocketIO", "New Player Connected: " + id);
-                if (flag) {
-                    amIFirst = false;
-                }
             }
         }).on("playerMoved", new Emitter.Listener() {
             @Override
