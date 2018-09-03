@@ -23,7 +23,6 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 import kz.enu.TheTogyzQumalaq;
-import kz.enu.ai.AI;
 import kz.enu.system.Registry;
 import kz.enu.sprites.Board;
 import kz.enu.sprites.Slot;
@@ -45,33 +44,25 @@ import static kz.enu.TheTogyzQumalaq.bPlaySound;
 
 public class PlayState extends State implements InputProcessor, Input.TextInputListener {
 
-    private static String opponentID = "";
-    private static String myID = "";
-
     private static final String FONT_PATH = "arial.ttf";
     private static final int FONT_SIZE = 15;
 
-    private static Socket socket;
-    private final static float UPDATE_TIME = 1 / 30f;
-    private float timer = 0;
 
     private static int GAME_MODE;
-    private static boolean bAnimationStarted;
-    private static boolean moveHasFinished;
+    protected static boolean bAnimationStarted;
     private static int frameCounter = 0;
     private final static int slowness = 20;
 
     private final static float SPASING = 87f;
     private final static float Y_OFFSET = 5f;
 
-    private static Slot[] slots = new Slot[18];
-    private static StoneBank[] stoneBanks = new StoneBank[2];
+    protected static Slot[] slots = new Slot[18];
+    protected static StoneBank[] stoneBanks = new StoneBank[2];
 
     private static String sSaveFile;
     private static FileHandle fileHandle;
 
-    private static boolean turn;
-    private static boolean isThinking;
+    protected static boolean turn;
 
     private static ArrayList<Board> shots = new ArrayList<Board>();
 
@@ -82,11 +73,8 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
     private static Sound error;
 
     private Texture bg;
-    private Texture slotTexture;
+    protected Texture slotTexture;
     private float alpha;
-
-    private static String sThinkingBar = "";
-    private static float fThinkingDuration = 0;
 
     private static Texture tuzdykTexture;
     private static Texture glowTexture;
@@ -110,26 +98,19 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
     public static int move = 0;
     public static boolean IS_NEW_GAME = false;
     public static int prevMove = 0;
+    protected boolean bNeedHandleInput = true;
+    protected boolean bNeedSaveGame = true;
 
     private BitmapFont oMainFont;
     private BitmapFont oMainFontFlipped;
     private BitmapFont oIceCreamFont;
     private BitmapFont oIceCreamFontFlipped;
 
-    private boolean isMoveTuzdykMaker = false;
-    private boolean isAIMoveTuzdykMaker = false;
-    private boolean bAIHasTuzdyk = false;
-    private boolean bAIMadeMove = false;
-    private boolean bPlayerMadeMove = false;
+    protected boolean isMoveTuzdykMaker = false;
+    protected boolean bPlayerMadeMove = false;
+
 
     private boolean isEffective = false;
-
-    private static final float DELAY = 1.2f;
-    private static float currentTime;
-    private static float deltaTime;
-
-    private boolean sinteticMove;
-    private static float wWaiting, wYourId;
 
     public PlayState(GameStateManager gsm, int mode, boolean isNewGame) {
         super(gsm);
@@ -145,26 +126,16 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         if (IS_NEW_GAME)
             try {
                 loadSavedFile();
-            } catch (FileNotFoundException fnfe) {
-            }
+            } catch (FileNotFoundException fnfe) {}
         else {
             turn = true;
-        }
-        if (GAME_MODE == Registry.INTERNET) {
-            connectSocket();
-            configSocketEvents();
         }
 
         Gdx.input.setInputProcessor(this);
         Gdx.input.setCatchBackKey(true);
         frameCounter = 0;
 
-        moveHasFinished = false;
         shots.clear();
-
-        if (opponentID.equals("") && TheTogyzQumalaq.getCreateConnect() == Registry.CONNECT && GAME_MODE == Registry.INTERNET) {
-            Gdx.input.getTextInput(this, TheTogyzQumalaq.LOCALE[23], "", "");
-        }
     }
 
     public static void setSlots(int[] slotCounter) {
@@ -191,18 +162,12 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
                 refreshGame();
             } catch (FileNotFoundException fnfe) {
             }
-            if (GAME_MODE == Registry.INTERNET) socket.emit("playerMoved", move);
-            moveHasFinished = false;
-            gsm.set(new GameOver(gsm));
 
         } else if (stoneBanks[0].currentStonesNumber == 81 && stoneBanks[1].currentStonesNumber == 81) {
             try {
                 refreshGame();
             } catch (FileNotFoundException fnfe) {
             }
-            if (GAME_MODE == Registry.INTERNET) socket.emit("playerMoved", move);
-            moveHasFinished = false;
-            gsm.set(new GameOver(gsm));
         }
     }
 
@@ -249,10 +214,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
 
     private void initVariables() {
         camera.setToOrtho(false, TheTogyzQumalaq.WIDTH, TheTogyzQumalaq.HEIGHT);
-        sThinkingBar = "";
-        fThinkingDuration = 0;
         bAnimationStarted = false;
-        isThinking = false;
 
         if (GAME_MODE == Registry.SINGLE_PLAYER) {
             sSaveFile = "saveAI.txt";
@@ -313,7 +275,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         jackpot = Util.getSound(Registry.JACKPOT);
     }
 
-    private void initFonts() {
+    protected void initFonts() {
         float fBorderWidth = 0;
         Color oBorderColor = new Color(0f, 0f, 0f, 1f);
         if (TheTogyzQumalaq.getIndexOfTheme() != 8 && TheTogyzQumalaq.getIndexOfTheme() != 6 && TheTogyzQumalaq.getIndexOfTheme() != 9) {
@@ -330,15 +292,6 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         oIceCreamFont = FontManager.getFont(FONT_PATH, FONT_SIZE, oIceCreamColor, fBorderWidth, oBorderColor, false);
         oIceCreamFontFlipped = FontManager.getFont(FONT_PATH, FONT_SIZE, oIceCreamColor, fBorderWidth, oBorderColor, true);
         oIceCreamFontFlipped.getData().setScale(-1, 1);
-
-        // Text width adjustments
-        GlyphLayout glyphLayout = new GlyphLayout();
-        glyphLayout.setText(TheTogyzQumalaq.getMainFont(), TheTogyzQumalaq.LOCALE[21]);
-        wWaiting = glyphLayout.width;
-        glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getMainFont(), TheTogyzQumalaq.LOCALE[22] + "000000000");
-        wYourId = glyphLayout.width;
-        glyphLayout.reset();
     }
 
     private void initTextures() {
@@ -366,14 +319,10 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         camera.unproject(tmp);
         if (Gdx.input.justTouched()) {
             if (undoRectangle.contains(tmp.x, tmp.y)) {
-
                 undo();
             } else if (homeRectangle.contains(tmp.x, tmp.y)) {
-                if (TheTogyzQumalaq.bPlaySound) TheTogyzQumalaq.getButtonSound().play();
-                if (GAME_MODE == Registry.INTERNET) socket.disconnect();
-                gsm.set(new MenuState(gsm, TheTogyzQumalaq.POSTFIX));
+                goToMainMenu();
             } else if (soundRectangle.contains(tmp.x, tmp.y)) {
-
                 if (bPlaySound) {
                     bPlaySound = false;
                     TheTogyzQumalaq.getBackgroundMusic().pause();
@@ -383,141 +332,56 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
                     TheTogyzQumalaq.getBackgroundMusic().play();
                     soundTexture = soundOnTexture;
                 }
-            } else if (GAME_MODE == Registry.INTERNET) {
-                if (Gdx.input.justTouched()) {
-                    for (int i = 0; i < 18; i++) {
-                        if (slots[i].isToched(camera)) {
-                            sinteticMove = false;
-                            move = slots[i].slotNumber;
-                            bAnimationStarted = true;
-                            if (slots[i].side == turn && slots[i].currentStonesNumber != 0)
-                                regShot();
-                            logic();
-                            printState();
-                        }
-                    }
-                }
-            } else if (GAME_MODE == Registry.MULTIPLAYER) {
-                if (Gdx.input.justTouched()) {
-                    for (int i = 0; i < slots.length; i++) {
-                        if (slots[i].isToched(camera)) {
-                            move = slots[i].slotNumber;
-                            bAnimationStarted = true;
-                            if (slots[i].side == turn && slots[i].currentStonesNumber != 0)
-                                regShot();
-                            logic();
-                            printState();
-                        }
-                    }
-                }
-            }
-        }
-        if (GAME_MODE == Registry.SINGLE_PLAYER) {
-            if (turn) {
-                if (Gdx.input.justTouched()) {
-                    for (int i = 0; i < slots.length; i++) {
-                        if (slots[i].isToched(camera)) {
-
-                            move = slots[i].slotNumber;
-                            bAnimationStarted = true;
-                            bPlayerMadeMove = true;
-                            if (slots[i].side == turn && slots[i].currentStonesNumber != 0)
-                                regShot();
-                            logic();
-                            printState();
-                        }
-                    }
-                }
             } else {
-                currentTime += deltaTime;
-                isThinking = true;
-                if (currentTime > DELAY) {
-                    switch (TheTogyzQumalaq.botLevel) {
-                        case AI.EASY_AI:
-                            move = AI.makeMoveEasyAI(slots);
-                            break;
-                        case AI.NORMAL_AI:
-                            move = AI.makeMoveNormalAI(slots);
-                            break;
-                        case AI.HARD_AI:
-                            move = AI.makeMoveHardAI(slots);
-                            break;
-                        case AI.EFFECTIVE_AI:
-                            move = AI.makeMoveEffectiveAI(slots);
-                            break;
-                        default:
-                            move = AI.makeMoveNormalAI(slots);
-                    }
-                    bAIMadeMove = true;
-                    bAnimationStarted = true;
-                    logic();
-                    currentTime = 0;
-                    printState();
-                    if (!bAIHasTuzdyk) for (int i = 0; i < 9; i++) {
-                        if (slots[i].isTuzdyk) {
-                            isAIMoveTuzdykMaker = true;
-                            bAIHasTuzdyk = true;
-                        }
-                    }
-                }
+                handleSpecificAction();
+            }
+            if (GAME_MODE == Registry.INTERNET) {
+
+            } else if (GAME_MODE == Registry.MULTIPLAYER) {
+
             }
         }
     }
 
-    public void updateServer(float dt) {
-        timer += dt;
-        if (timer >= UPDATE_TIME && moveHasFinished && !sinteticMove) {
-            socket.emit("playerMoved", move, opponentID);
-            moveHasFinished = false;
-        }
-    }
 
     @Override
     public void update(float dt) {
-        deltaTime = dt;
-        if (isThinking) fThinkingDuration += dt;
-        if (alpha > 0) {
-            alpha -= 0.02f;
-            blackSprite.setAlpha(alpha);
+        // Transition animation
+        fadeOffBlackWindow();
+
+        if (bNeedSaveGame) {
+            try {
+                saveGame();
+            } catch (FileNotFoundException fnfe) {}
         }
-        if (sThinkingBar.length() > 2) {
-            sThinkingBar = "";
-        } else if (fThinkingDuration > 0.3f) {
-            sThinkingBar += ".";
-            fThinkingDuration = 0;
-        }
-        if (GAME_MODE == Registry.SINGLE_PLAYER || GAME_MODE == Registry.MULTIPLAYER) try {
-            saveGame();
-        } catch (FileNotFoundException fnfe) {
-        }
-        if (((!opponentID.equals("")) && GAME_MODE == Registry.INTERNET) || GAME_MODE == Registry.SINGLE_PLAYER || GAME_MODE == Registry.MULTIPLAYER)
+        if (bNeedHandleInput)
             handleInput();
 
+        // Animation of stones TODO: Reimplement with hand
         if (bAnimationStarted) {
-            for (int i = 0; i < slots.length; i++) {
-                slots[i].fadeStoneAnimation(1 / (float) slowness);
+            for (Slot slot :slots) {
+                slot.fadeStoneAnimation(1 / (float) slowness);
             }
-            for (int i = 0; i < stoneBanks.length; i++) {
-                stoneBanks[i].fadeStoneAnimation(1 / (float) slowness);
+            for (StoneBank stoneBank : stoneBanks) {
+                stoneBank.fadeStoneAnimation(1 / (float) slowness);
             }
             frameCounter++;
         }
         if (frameCounter == slowness) {
             bAnimationStarted = false;
-            for (int i = 0; i < slots.length; i++) {
-                slots[i].fadeInAlpha = 0;
-                slots[i].fadeOutAlpha = 1;
-                slots[i].oldStonesNumber = slots[i].currentStonesNumber;
-                slots[i].resetStonesAlpha();
+            for (Slot slot :slots) {
+                slot.fadeInAlpha = 0;
+                slot.fadeOutAlpha = 1;
+                slot.oldStonesNumber = slot.currentStonesNumber;
+                slot.resetStonesAlpha();
             }
-            for (int i = 0; i < stoneBanks.length; i++) {
-                stoneBanks[i].fadeInAlpha = 0;
-                stoneBanks[i].oldStonesNumber = stoneBanks[i].currentStonesNumber;
-                stoneBanks[i].resetStonesAlpha();
+            for (StoneBank stoneBank : stoneBanks) {
+                stoneBank.fadeInAlpha = 0;
+                stoneBank.oldStonesNumber = stoneBank.currentStonesNumber;
+                stoneBank.resetStonesAlpha();
             }
             frameCounter = 0;
         }
-        if (GAME_MODE == Registry.INTERNET) updateServer(dt);
         checkTheVictory();
         camera.update();
     }
@@ -527,23 +391,21 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         sb.setProjectionMatrix(camera.combined);
         sb.begin();
         sb.draw(bg, 0, 0);
-        if (((!opponentID.equals("")) && GAME_MODE == Registry.INTERNET) || GAME_MODE == Registry.SINGLE_PLAYER || GAME_MODE == Registry.MULTIPLAYER) {
-            for (int i = 0; i < slots.length; i++) {
-                if (!slots[i].isTuzdyk)
-                    sb.draw(slots[i].texture, slots[i].x, slots[i].y);
+        if (bNeedHandleInput) {
+            for (Slot slot :slots) {
+                if (!slot.isTuzdyk)
+                    sb.draw(slot.texture, slot.x, slot.y);
                 else {
-                    sb.draw(tuzdykTexture, slots[i].x, slots[i].y);
+                    sb.draw(tuzdykTexture, slot.x, slot.y);
                 }
 
-                slots[i].drawStones(sb);
+                slot.drawStones(sb);
 
-                if (slots[i].side) {
-                    slots[i].drawCurrentNumber(sb, oMainFont, oIceCreamFont);
+                if (slot.side) {
+                    slot.drawCurrentNumber(sb, oMainFont, oIceCreamFont);
                 } else {
-                    slots[i].drawCurrentNumber(sb, oMainFontFlipped, oIceCreamFontFlipped);
-
+                    slot.drawCurrentNumber(sb, oMainFontFlipped, oIceCreamFontFlipped);
                 }
-
             }
             for (int i = 0; i < stoneBanks.length; i++) {
                 sb.draw(stoneBanks[i].texture, stoneBanks[i].x, stoneBanks[i].y);
@@ -554,8 +416,9 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
             sb.draw(undoTexture, 822f, 475f);
             sb.draw(homeTexture, 822f, 42f);
             sb.draw(soundTexture, 822f, 106f);
-            if (isThinking) TheTogyzQumalaq.getMainFont().draw(sb, sThinkingBar, 822f, 440f);
 
+            // For single player only
+            renderThinkingBar(sb);
 
             if (turn) {
                 sb.draw(turnDownTexture, 5, 5);
@@ -563,10 +426,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
                 sb.draw(turnUpTexture, 5, 265);
             }
         } else {
-            if (opponentID.equals("") && TheTogyzQumalaq.getCreateConnect() == Registry.CREATE && GAME_MODE == Registry.INTERNET) {
-                TheTogyzQumalaq.getMainFont().draw(sb, TheTogyzQumalaq.LOCALE[21], (TheTogyzQumalaq.WIDTH - wWaiting) / 2, TheTogyzQumalaq.HEIGHT / 2);
-                TheTogyzQumalaq.getMainFont().draw(sb, TheTogyzQumalaq.LOCALE[22] + myID, (TheTogyzQumalaq.WIDTH - wYourId) / 2, TheTogyzQumalaq.HEIGHT / 2 + 100f);
-            }
+            renderSpecificAction(sb);
         }
         if (alpha > 0) {
             blackSprite.draw(sb);
@@ -593,13 +453,12 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         error.dispose();
         jackpot.dispose();
         tuzdykSound.dispose();
-        for (int i = 0; i < slots.length; i++) {
-            slots[i].dispose();
+        for (Slot slot :slots) {
+            slot.dispose();
         }
-        for (int i = 0; i < stoneBanks.length; i++) {
-            stoneBanks[i].dispose();
+        for (StoneBank stoneBank : stoneBanks) {
+            stoneBank.dispose();
         }
-        //tuzdykAnimationTexture.dispose();
         oIceCreamFont.dispose();
         oMainFont.dispose();
         oMainFontFlipped.dispose();
@@ -608,7 +467,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         turnUpTexture.dispose();
     }
 
-    private static void printState() {
+    protected static void printState() {
         if (turn) System.out.println("Turn of First Player!");
         else System.out.println("Turn of Second Player!");
 
@@ -693,26 +552,18 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         return (Index + 9) % 18;
     }
 
-    private void logic() {
+    protected void logic() {
 
         int lastSlotIndex;
         if (isAtsyrau()) {
-            System.out.println("Atsyrau! U Lose");
             gsm.set(new GameOver(gsm));
         }
 
         lastSlotIndex = makeMove(move);
 
         if (lastSlotIndex != -1) {
-            if (GAME_MODE == Registry.MULTIPLAYER || GAME_MODE == Registry.INTERNET)
-                isMoveTuzdykMaker = false;
-            if (GAME_MODE == Registry.SINGLE_PLAYER && bPlayerMadeMove && isMoveTuzdykMaker)
-                isMoveTuzdykMaker = false;
-            if (GAME_MODE == Registry.SINGLE_PLAYER && bAIMadeMove && isAIMoveTuzdykMaker)
-                isAIMoveTuzdykMaker = false;
-            if (GAME_MODE == Registry.SINGLE_PLAYER && !turn) {
-                isThinking = false;
-            }
+            specificCorrectMoveAction();
+
             if (turn == !slots[lastSlotIndex].side) {
 
                 if (slots[lastSlotIndex].currentStonesNumber % 2 == 0) {
@@ -729,7 +580,6 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
                     }
                     isEffective = true;
                 }
-
 
                 if (slots[lastSlotIndex].currentStonesNumber == 3) {
 
@@ -751,10 +601,8 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
                     empty.play();
                 }
             isEffective = false;
-            moveHasFinished = true;
         }
 
-        if (bAIMadeMove) bAIMadeMove = false;
         if (bPlayerMadeMove) bPlayerMadeMove = false;
         turn ^= true;
     }
@@ -763,8 +611,6 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
     public boolean keyDown(int keycode) {
 
         if (keycode == Input.Keys.BACK) {
-
-            if (GAME_MODE == Registry.INTERNET) socket.disconnect();
             gsm.set(new MenuState(gsm, TheTogyzQumalaq.POSTFIX));
 
         } else if (keycode == Input.Keys.SPACE) {
@@ -877,16 +723,12 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         }
     }
 
-    private static void regShot() {
+    protected static void regShot() {
         shots.clear();
         shots.add(new Board(slots, stoneBanks, turn));
     }
 
-    private void undo() {
-
-
-        System.out.println("IsTuzdykMaker" + isMoveTuzdykMaker);
-        System.out.println("IsAiTuzdykMaker" + isAIMoveTuzdykMaker);
+    protected void undo() {
         if (isMoveTuzdykMaker) {
             for (int i = 0; i < slots.length; i++) {
                 if (GAME_MODE == Registry.SINGLE_PLAYER) {
@@ -904,16 +746,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
             }
             isMoveTuzdykMaker = false;
         }
-        if (isAIMoveTuzdykMaker) {
-            for (int i = 0; i < slots.length; i++) {
-                if (slots[i].side == turn) {
-                    slots[i].texture = slotTexture;
-                    slots[i].isTuzdyk = false;
-                    isAIMoveTuzdykMaker = false;
-                    bAIHasTuzdyk = false;
-                }
-            }
-        }
+        specificUndoAction();
         try {
             shots.get(shots.size() - 1).getShot(this);
             shots.remove(shots.size() - 1);
@@ -926,17 +759,17 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
     }
 
 
-    public static boolean isTuzdykAvailable() {
+    private static boolean isTuzdykAvailable() {
         boolean b = true;
         if (!turn) {
             for (int i = 0; i < 9; i++) {
-                if (slots[i].isTuzdyk == true) {
+                if (slots[i].isTuzdyk) {
                     b = false;
                 }
             }
         } else {
             for (int i = 9; i < 18; i++) {
-                if (slots[i].isTuzdyk == true) {
+                if (slots[i].isTuzdyk) {
                     b = false;
                 }
             }
@@ -944,61 +777,29 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         return b;
     }
 
-    public static void connectSocket() {
-        try {
-            socket = IO.socket("https://togyz.herokuapp.com");
-            //socket = IO.socket("http://localhost:3000");
-            socket.connect();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void configSocketEvents() {
-        socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                Gdx.app.log("SocketIO", "Connected");
-            }
-        }).on("socketID", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                String id = args[0].toString();
-                myID = id;
-                Gdx.app.log("SocketIO", "My ID: " + id);
-            }
-        }).on("newPlayer", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                String id = args[0].toString();
-                Gdx.app.log("SocketIO", "New Player Connected: " + id);
-            }
-        }).on("playerMoved", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                sinteticMove = true;
-                move = (Integer) args[0];
-                bAnimationStarted = true;
-                logic();
-                printState();
-            }
-        }).on("opponentConnected", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                opponentID = args[0].toString();
-
-            }
-        });
-    }
-
     @Override
-    public void input(String text) {
-        opponentID = text;
-        socket.emit("opponentConnected", myID, opponentID);
-    }
+    public void input(String text) { }
 
     @Override
     public void canceled() {
         Gdx.app.log("X", "Cc");
     }
+
+    protected void fadeOffBlackWindow() {
+        if (alpha > 0) {
+            alpha -= 0.02f;
+            blackSprite.setAlpha(alpha);
+        }
+    }
+
+    protected void goToMainMenu() {
+        if (TheTogyzQumalaq.bPlaySound) TheTogyzQumalaq.getButtonSound().play();
+        gsm.set(new MenuState(gsm, TheTogyzQumalaq.POSTFIX));
+    }
+
+    protected void handleSpecificAction() {}
+    protected void renderSpecificAction(SpriteBatch sb) {}
+    protected void renderThinkingBar(SpriteBatch sb) {}
+    protected void specificCorrectMoveAction() {}
+    protected void specificUndoAction() {}
 }
