@@ -1,4 +1,4 @@
-package kz.enu.states;
+package kz.enu.states.view;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
@@ -7,31 +7,32 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 
-import kz.enu.ResID;
 import kz.enu.TheTogyzQumalaq;
+import kz.enu.states.model.PlayState;
+import kz.enu.system.Registry;
+import kz.enu.system.Util;
 
 
 /**
  * Created by SLUX on 17.05.2017.
  */
 
-public class GameOver extends State {
+public class GameOver extends kz.enu.states.model.State {
 
     private Texture background;
-    //private Texture wrapperTexture;
     private static final float DELAY = 1.2f;
     private static float currentTime;
     private Sound win;
+    private String sFinalText;
     float w, w1;
 
-    public GameOver(GameStateManager gsm) {
+    public GameOver(kz.enu.states.model.GameStateManager gsm, String sResult) {
         super(gsm);
-        background = new Texture(ResID.BACKGROUND + TheTogyzQumalaq.POSTFIX + ".png");
-        //wrapperTexture = new Texture(ResID.WRAPPER + TheTogyzQumalaq.POSTFIX+".png");
+        background = Util.getTexture(Registry.BACKGROUND);
+        sFinalText = sResult;
 
-        win = Gdx.audio.newSound(Gdx.files.internal(ResID.WIN));
+        win = Gdx.audio.newSound(Gdx.files.internal(Registry.WIN));
         if (TheTogyzQumalaq.bPlaySound) win.play();
-        //bitmapFont.getData().setScale(2f);
         camera.setToOrtho(false, TheTogyzQumalaq.WIDTH, TheTogyzQumalaq.HEIGHT);
         currentTime = 0;
         GlyphLayout glyphLayout = new GlyphLayout();
@@ -39,9 +40,8 @@ public class GameOver extends State {
         glyphLayout.setText(TheTogyzQumalaq.getMainFont(), item);
         w = glyphLayout.width;
         glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getMainFont(), PlayState.getGameOverWords());
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(), sFinalText);
         w1 = glyphLayout.width;
-        //if (PlayState.getMode() == ResID.INTERNET) PlayState.getSocket().disconnect();
 
     }
 
@@ -64,13 +64,8 @@ public class GameOver extends State {
         sb.setProjectionMatrix(camera.combined);
         sb.begin();
         sb.draw(background, 0, 0, TheTogyzQumalaq.WIDTH, TheTogyzQumalaq.HEIGHT);
-        //sb.draw(wrapperTexture,(TheTogyzQumalaq.WIDTH-wrapperTexture.getWidth())/2,290f);
-        TheTogyzQumalaq.getMainFont().draw(sb, PlayState.getGameOverWords(), (TheTogyzQumalaq.WIDTH - w1) / 2, 350f);
-        if (!PlayState.isTurn()) {
-            TheTogyzQumalaq.getMainFont().draw(sb, PlayState.getResult(), (TheTogyzQumalaq.WIDTH / 2) - (w / 2), TheTogyzQumalaq.HEIGHT / 2);
-        } else {
-            TheTogyzQumalaq.getMainFont().draw(sb, PlayState.getResult(), (TheTogyzQumalaq.WIDTH / 2) - (w / 2), TheTogyzQumalaq.HEIGHT / 2);
-        }
+        TheTogyzQumalaq.getMainFont().draw(sb, sFinalText, (TheTogyzQumalaq.WIDTH - w1) / 2, 350f);
+        TheTogyzQumalaq.getMainFont().draw(sb, PlayState.getResult(), (TheTogyzQumalaq.WIDTH / 2) - (w / 2), TheTogyzQumalaq.HEIGHT / 2);
         sb.end();
     }
 
@@ -78,7 +73,6 @@ public class GameOver extends State {
     public void dispose() {
         background.dispose();
         win.dispose();
-        //wrapperTexture.dispose();
         System.out.println("GameOver Disposed");
     }
 

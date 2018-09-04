@@ -1,53 +1,57 @@
-package kz.enu;
+package kz.enu.ai;
 
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import kz.enu.sprites.Slot;
 
 public class AI {
-    public static final float AGRESSIVE_FACTOR = 0.983f;
+    private static final float AGRESSIVE_FACTOR = 0.983f;
 
-    public static ArrayList<Integer> getPossibleRandom(Slot[] slots){
-        ArrayList arr = new ArrayList();
+    // AI LEVELS
+    public static final int EASY_AI      = 0;
+    public static final int NORMAL_AI    = 1;
+    public static final int HARD_AI      = 2;
+    public static final int EFFECTIVE_AI = 3;
+
+    private static ArrayList<Integer> getPossibleRandom(Slot[] slots){
+        ArrayList<Integer> arr = new ArrayList<Integer>();
         for(int i = 9;i<slots.length;i++) {
             if (slots[i].currentStonesNumber != 0) {
                 arr.add(i);
-                //System.out.print(i+" ");
             }
         }
-        //System.out.print("\n");
         return arr;
     }
-    public static int makeMoveHardAI(Slot [] slots,Map <Integer,Integer> possibleMoves)
+
+    public static int makeMoveHardAI(Slot [] slots)
     {
-        Slot [] tempSlots = slots;
+        Map <Integer, Integer> possibleMoves = new HashMap<Integer, Integer>();
         int  choice = makeMoveEasyAI(slots);
         boolean nothingToGet = false;
         for(int i=9;i<18;i++)
         {
-            if(tempSlots[i].currentStonesNumber != 1 && tempSlots[i].currentStonesNumber !=0)
+            if(slots[i].currentStonesNumber != 1 && slots[i].currentStonesNumber !=0)
             {
-                if(tempSlots[(i + (tempSlots[i].currentStonesNumber - 1))%18].side==true &&
-                        (tempSlots[(i + (tempSlots[i].currentStonesNumber - 1))%18].currentStonesNumber+1) % 2 == 0 )
+                if(slots[(i + (slots[i].currentStonesNumber - 1))%18].side &&
+                        (slots[(i + (slots[i].currentStonesNumber - 1))%18].currentStonesNumber+1) % 2 == 0 )
                 {
-                    possibleMoves.put(i ,tempSlots[(i + (tempSlots[i].currentStonesNumber - 1))%18].currentStonesNumber+1 );
+                    possibleMoves.put(i ,slots[(i + (slots[i].currentStonesNumber - 1))%18].currentStonesNumber+1 );
                 }
-                if(tempSlots[(i + (tempSlots[i].currentStonesNumber - 1))%18].currentStonesNumber+1 == 3)
+                if(slots[(i + (slots[i].currentStonesNumber - 1))%18].currentStonesNumber+1 == 3)
                 {
                     choice = i;break;
                 }
             }
-
-
         }
         if(!possibleMoves.isEmpty()){
             if(possibleMoves.size()>1){
-                int keyOfMaxValue = Collections.max(
+                choice = Collections.max(
                         possibleMoves.entrySet(),
                         new Comparator<Entry<Integer,Integer>>(){
                             @Override
@@ -55,7 +59,6 @@ public class AI {
                                 return o1.getValue() > o2.getValue()? 1:-1;
                             }
                         }).getKey();
-                choice = keyOfMaxValue;
                 possibleMoves.clear();
             }
             else {
@@ -63,45 +66,43 @@ public class AI {
                 possibleMoves.clear();
             }
         } else nothingToGet= true;
-        if(nothingToGet==true)
-            choice = protectMineOdd(tempSlots);
+        if(nothingToGet)
+            choice = protectPlayerOddSlots(slots);
         return choice;
     }
 
 
-    public static int protectMineOdd(Slot [] slots){
+    private static int protectPlayerOddSlots(Slot [] slots){
         int  choice = makeMoveEasyAI(slots);
-        Slot [] tempSlots = slots;
-        int OddSlotsNumber = 0;
+        int iPlayerOddSlots = 0;
         ArrayList<Integer> positionOfOdd = new ArrayList<Integer>();
-        for(int i=9;i<tempSlots.length;i++)
+        for(int i=9;i<slots.length;i++)
         {
-            if(tempSlots[i].currentStonesNumber%2!=0)
+            if(slots[i].currentStonesNumber%2!=0)
             {
-                OddSlotsNumber++;
+                iPlayerOddSlots++;
                 positionOfOdd.add(i);
             }
-
         }
-        if(OddSlotsNumber==1)
+        if(iPlayerOddSlots==1)
         {
-            for(int i=9;i<tempSlots.length;i++)
+            for(int i=9;i<slots.length;i++)
             {
-                if(tempSlots[i].currentStonesNumber==2||tempSlots[i].currentStonesNumber==1)
+                if(slots[i].currentStonesNumber==2||slots[i].currentStonesNumber==1)
                 {
                     if(positionOfOdd.get(0)-i==1)
                     {choice = i;break;}
-                    if(	((tempSlots[((tempSlots[i].currentStonesNumber-1)+i)%18].currentStonesNumber+1)%2 == 0)
-                            &&( (((tempSlots[i].currentStonesNumber-1)+i)%18==positionOfOdd.get(0))))
+                    if(	((slots[((slots[i].currentStonesNumber-1)+i)%18].currentStonesNumber+1)%2 == 0)
+                            &&( (((slots[i].currentStonesNumber-1)+i)%18==positionOfOdd.get(0))))
                     {
-                        if(tempSlots[i].currentStonesNumber!=0){
+                        if(slots[i].currentStonesNumber!=0){
                             choice = i;
                             break;}
                     }
                 }
             }
-            if((positionOfOdd.get(0)==17||positionOfOdd.get(0)==16)&& tempSlots[positionOfOdd.get(0)].currentStonesNumber <= positionOfOdd.get(0)-9)
-                if(tempSlots[positionOfOdd.get(0)].currentStonesNumber!=0)
+            if((positionOfOdd.get(0)==17||positionOfOdd.get(0)==16)&& slots[positionOfOdd.get(0)].currentStonesNumber <= positionOfOdd.get(0)-9)
+                if(slots[positionOfOdd.get(0)].currentStonesNumber!=0)
 
                     choice = positionOfOdd.get(0);
         }
@@ -113,10 +114,10 @@ public class AI {
                 Indexs[i] = positionOfOdd.get(i);
 
             for(int i=0;i<OddSlots.length;i++)
-                OddSlots[i] = tempSlots[Indexs[i]].currentStonesNumber;
+                OddSlots[i] = slots[Indexs[i]].currentStonesNumber;
 
-            int temp = 0;
-            int tempIndex = 0;
+            int temp;
+            int tempIndex;
             for(int i=0; i < OddSlots.length; i++)
                 for(int j=1; j < (OddSlots.length-i); j++){
                     if(OddSlots[j-1] < OddSlots[j]){
@@ -132,50 +133,45 @@ public class AI {
             boolean flag= false;
             for(int i=0;i<OddSlots.length;i++)
             {
-                for(int j=9;j<tempSlots.length;j++)
+                for(int j=9;j<slots.length;j++)
                 {
-                    if(tempSlots[j].currentStonesNumber==2||tempSlots[j].currentStonesNumber==1)
+                    if(slots[j].currentStonesNumber==2||slots[j].currentStonesNumber==1)
                     {
                         if(Indexs[i]-j==1)
-                        {if(tempSlots[j].currentStonesNumber!=0){
+                        {if(slots[j].currentStonesNumber!=0){
                             choice = j;
                             flag = true;break;
                         }}
                     }
-                    if(  ((tempSlots[((tempSlots[j].currentStonesNumber-1)+j)%18].currentStonesNumber+1)%2 == 0)
-                            && ((tempSlots[j].currentStonesNumber-1)+j) == Indexs[i])
+                    if(  ((slots[((slots[j].currentStonesNumber-1)+j)%18].currentStonesNumber+1)%2 == 0)
+                            && ((slots[j].currentStonesNumber-1)+j) == Indexs[i])
                     {
-                        if(tempSlots[j].currentStonesNumber!=0){
+                        if(slots[j].currentStonesNumber!=0){
                             choice = j;
                             flag = true;break;}
                     }
                 }
                 if(flag)break;
-                if((Indexs[i]==17||Indexs[i]==16)&& tempSlots[Indexs[i]].currentStonesNumber <= Indexs[i])
-                    if(tempSlots[Indexs[i]].currentStonesNumber!=0){
+                if((Indexs[i]==17||Indexs[i]==16)&& slots[Indexs[i]].currentStonesNumber <= Indexs[i])
+                    if(slots[Indexs[i]].currentStonesNumber!=0){
                         choice = Indexs[i];break;}
             }
         }
-        if(OddSlotsNumber == 0) return makeMoveEasyAI(slots);
+        if(iPlayerOddSlots == 0) return makeMoveEasyAI(slots);
         positionOfOdd.clear();
-        OddSlotsNumber=0;
         return choice;
     }
 
-    public static int makeMoveNormalAI(Slot[] slots, Map<Integer,Integer> possibleMoves)
+    public static int makeMoveNormalAI(Slot[] slots)
     {
-
-        int  choice = makeMoveEasyAI(slots);
-        Slot [] tempSlots = slots;
-        //int choice;
-        //int temp[] = new int [9];
+        Map <Integer, Integer> possibleMoves = new HashMap<Integer, Integer>();
         for(int i=9;i<18;i++)
         {
-            if(tempSlots[i].currentStonesNumber != 1 && tempSlots[i].currentStonesNumber !=0)
+            if(slots[i].currentStonesNumber != 1 && slots[i].currentStonesNumber !=0)
             {
-                if(tempSlots[(i + (tempSlots[i].currentStonesNumber - 1))%18].side &&
-                        (tempSlots[(i + (tempSlots[i].currentStonesNumber - 1))%18].currentStonesNumber+1) % 2 == 0 )
-                    possibleMoves.put(i ,tempSlots[(i + (tempSlots[i].currentStonesNumber - 1))%18].currentStonesNumber+1 );
+                if(slots[(i + (slots[i].currentStonesNumber - 1))%18].side &&
+                        (slots[(i + (slots[i].currentStonesNumber - 1))%18].currentStonesNumber+1) % 2 == 0 )
+                    possibleMoves.put(i ,slots[(i + (slots[i].currentStonesNumber - 1))%18].currentStonesNumber+1 );
 
             }
         }
@@ -198,16 +194,15 @@ public class AI {
 
     public static int makeMoveEasyAI(Slot[] slots){
         ArrayList<Integer> random = getPossibleRandom(slots);
-        int choice = 0;
+        int choice;
         try{
             choice = random.get((int) (Math.random() * random.size()));
-        }catch (IndexOutOfBoundsException ex){
-        }
+        }catch (IndexOutOfBoundsException ex) { throw new IndexOutOfBoundsException(); }
         return choice;
     }
 
 
-    public static float imitateMove(Slot[] slot,int move){
+    private static float imitateMove(Slot[] slot,int move){
         Slot[] slots = new Slot[18];
         float extraProb = 0;
         int stack = slot[move].currentStonesNumber;
@@ -262,7 +257,7 @@ public class AI {
 
     public static int makeMoveEffectiveAI(Slot [] slots){
         int choice = 9;
-        float maximum = 0;
+        float maximum;
         if(slots[9].isTuzdyk)
         {maximum = imitateMove(slots,10);choice = 10;}
         else
@@ -277,7 +272,4 @@ public class AI {
 
         return choice;
     }
-
-
-
 }
