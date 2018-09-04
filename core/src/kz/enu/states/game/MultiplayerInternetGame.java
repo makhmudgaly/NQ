@@ -10,6 +10,7 @@ import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 import kz.enu.TheTogyzQumalaq;
 import kz.enu.states.model.GameStateManager;
+import kz.enu.states.model.PlayState;
 import kz.enu.states.view.GameOver;
 import kz.enu.system.Registry;
 
@@ -29,12 +30,9 @@ public class MultiplayerInternetGame extends PlayState {
     private static float wWaiting, wYourId;
 
 
-    // Override fields
-    protected boolean bNeedSaveGame = false;
-
-    public MultiplayerInternetGame(GameStateManager gsm, int mode, boolean isNewGame) {
-        super(gsm, mode, isNewGame);
-
+    public MultiplayerInternetGame(GameStateManager gsm) {
+        super(gsm);
+        bNeedSaveGame = false;
         if (opponentID.equals("") && TheTogyzQumalaq.getCreateConnect() == Registry.CONNECT) {
             Gdx.input.getTextInput(this, TheTogyzQumalaq.LOCALE[23], "", "");
         }
@@ -70,13 +68,19 @@ public class MultiplayerInternetGame extends PlayState {
         super.checkTheVictory();
         socket.emit("playerMoved", move);
         moveHasFinished = false;
-        gsm.set(new GameOver(gsm));
+        gsm.set(new GameOver(gsm, getGameOverWords()));
     }
 
     @Override
     protected void goToMainMenu() {
         super.goToMainMenu();
         socket.disconnect();
+    }
+
+    @Override
+    protected void undo() {
+        bUndoTurn = turn;
+        super.undo();
     }
 
     @Override
@@ -175,5 +179,20 @@ public class MultiplayerInternetGame extends PlayState {
     public void input(String text) {
         opponentID = text;
         socket.emit("opponentConnected", myID, opponentID);
+    }
+
+
+    @Override
+    public String getGameOverWords() {
+        if (isAtsyrau()) {
+            if (!turn) return TheTogyzQumalaq.LOCALE[12];
+            else return TheTogyzQumalaq.LOCALE[13];
+        } else if (stoneBanks[0].currentStonesNumber == 81 && stoneBanks[1].currentStonesNumber == 81) {
+            return TheTogyzQumalaq.LOCALE[11];
+        } else if (stoneBanks[0].currentStonesNumber > stoneBanks[1].currentStonesNumber) {
+            return TheTogyzQumalaq.LOCALE[12];
+        } else {
+            return TheTogyzQumalaq.LOCALE[13];
+        }
     }
 }

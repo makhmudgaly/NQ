@@ -8,6 +8,7 @@ import kz.enu.TheTogyzQumalaq;
 import kz.enu.system.Registry;
 
 /**
+ * Transition State before Game
  * Created by SLUX on 26.06.2017.
  */
 
@@ -50,13 +51,13 @@ public class LoadingState extends kz.enu.states.model.State {
             // Rendering corresponding game state
             switch (GAME_MODE) {
                 case Registry.SINGLE_PLAYER:
-                    gsm.set(new kz.enu.states.game.SinglePlayerGame(gsm, GAME_MODE, IS_NEW_GAME));
+                    gsm.set(new kz.enu.states.game.SinglePlayerGame(gsm, IS_NEW_GAME));
                     break;
                 case Registry.MULTIPLAYER:
-                    gsm.set(new kz.enu.states.game.MultiplayerLocalGame(gsm, GAME_MODE, IS_NEW_GAME));
+                    gsm.set(new kz.enu.states.game.MultiplayerLocalGame(gsm, IS_NEW_GAME));
                     break;
                 case Registry.INTERNET:
-                    gsm.set(new kz.enu.states.game.MultiplayerInternetGame(gsm, GAME_MODE, IS_NEW_GAME));
+                    gsm.set(new kz.enu.states.game.MultiplayerInternetGame(gsm));
                     break;
                 case Registry.TUTORIAL:
                     gsm.set(new kz.enu.states.game.TrainingState(gsm));

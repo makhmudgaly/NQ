@@ -2,16 +2,31 @@ package kz.enu.states.game;
 
 import com.badlogic.gdx.Gdx;
 
+import kz.enu.TheTogyzQumalaq;
 import kz.enu.states.model.GameStateManager;
+import kz.enu.states.model.LocalGame;
 
 /**
+ * Multiplayer game on same device
  * Created by Meirkhan on 03.09.2018.
  */
 
-public class MultiplayerLocalGame extends PlayState{
+public class MultiplayerLocalGame extends LocalGame {
 
-    public MultiplayerLocalGame(GameStateManager gsm, int mode, boolean isNewGame) {
-        super(gsm, mode, isNewGame);
+    public MultiplayerLocalGame(GameStateManager gsm, boolean isNewGame) {
+        super(gsm, isNewGame);
+    }
+
+    @Override
+    protected void initVariables() {
+        super.initVariables();
+        sSaveFile = "save.txt";
+    }
+
+    @Override
+    protected void undo() {
+        bUndoTurn = turn;
+        super.undo();
     }
 
     @Override
@@ -32,5 +47,19 @@ public class MultiplayerLocalGame extends PlayState{
     @Override
     protected void specificCorrectMoveAction() {
         isMoveTuzdykMaker = false;
+    }
+
+    @Override
+    public String getGameOverWords() {
+        if (isAtsyrau()) {
+            if (!turn) return TheTogyzQumalaq.LOCALE[12];
+            else return TheTogyzQumalaq.LOCALE[13];
+        } else if (stoneBanks[0].currentStonesNumber == 81 && stoneBanks[1].currentStonesNumber == 81) {
+            return TheTogyzQumalaq.LOCALE[11];
+        } else if (stoneBanks[0].currentStonesNumber > stoneBanks[1].currentStonesNumber) {
+            return TheTogyzQumalaq.LOCALE[12];
+        } else {
+            return TheTogyzQumalaq.LOCALE[13];
+        }
     }
 }

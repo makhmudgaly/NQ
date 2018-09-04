@@ -1,19 +1,18 @@
 package kz.enu.states.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import kz.enu.TheTogyzQumalaq;
 import kz.enu.ai.AI;
 import kz.enu.states.model.GameStateManager;
-
+import kz.enu.states.model.LocalGame;
 /**
  * Single Player
  * Created by Meirkhan on 03.09.2018.
  */
 
-public class SinglePlayerGame extends PlayState {
+public class SinglePlayerGame extends LocalGame {
     private static boolean isThinking;
     private static String sThinkingBar = "";
 
@@ -28,8 +27,8 @@ public class SinglePlayerGame extends PlayState {
     private static float deltaTime;
     private static float fThinkingDuration = 0;
 
-    public SinglePlayerGame(GameStateManager gsm, int mode, boolean isNewGame) {
-        super(gsm, mode, isNewGame);
+    public SinglePlayerGame(GameStateManager gsm, boolean isNewGame) {
+        super(gsm, isNewGame);
         isThinking = false;
         sThinkingBar = "";
         fThinkingDuration = 0;
@@ -43,6 +42,7 @@ public class SinglePlayerGame extends PlayState {
 
     @Override
     protected void handleInput() {
+        super.handleInput();
         if (turn) {
             if (Gdx.input.justTouched()) {
                 for (int i = 0; i < slots.length; i++) {
@@ -100,19 +100,31 @@ public class SinglePlayerGame extends PlayState {
     }
 
     @Override
+    protected int makeMove(int slotIndex) {
+        bNeedErrorSound = !turn;
+        return super.makeMove(slotIndex);
+    }
+
+    @Override
+    protected void undo() {
+        bUndoTurn = !turn;
+        super.undo();
+    }
+
+    @Override
     protected void renderThinkingBar(SpriteBatch sb) {
         if (isThinking) TheTogyzQumalaq.getMainFont().draw(sb, sThinkingBar, 822f, 440f);
     }
 
     @Override
     protected void specificCorrectMoveAction() {
-        if(bPlayerMadeMove && isMoveTuzdykMaker) {
+        if (bPlayerMadeMove && isMoveTuzdykMaker) {
             isMoveTuzdykMaker = false;
         }
-        if(bAIMadeMove && isAIMoveTuzdykMaker) {
+        if (bAIMadeMove && isAIMoveTuzdykMaker) {
             isAIMoveTuzdykMaker = false;
         }
-        if(!turn) {
+        if (!turn) {
             isThinking = false;
         }
     }
@@ -139,6 +151,33 @@ public class SinglePlayerGame extends PlayState {
         } else if (fThinkingDuration > 0.3f) {
             sThinkingBar += ".";
             fThinkingDuration = 0;
+        }
+    }
+
+    @Override
+    protected void initVariables() {
+        super.initVariables();
+        sSaveFile = "saveAI.txt";
+    }
+
+    @Override
+    protected void initResource() {
+        super.initResource();
+
+    }
+
+
+    @Override
+    public String getGameOverWords() {
+        if (isAtsyrau()) {
+            if (!turn) return TheTogyzQumalaq.LOCALE[9];
+            else return TheTogyzQumalaq.LOCALE[10];
+        } else if (stoneBanks[0].currentStonesNumber == 81 && stoneBanks[1].currentStonesNumber == 81) {
+            return TheTogyzQumalaq.LOCALE[11];
+        } else if (stoneBanks[0].currentStonesNumber > stoneBanks[1].currentStonesNumber) {
+            return TheTogyzQumalaq.LOCALE[9];
+        } else {
+            return TheTogyzQumalaq.LOCALE[10];
         }
     }
 }

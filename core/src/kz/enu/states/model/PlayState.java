@@ -1,35 +1,26 @@
-package kz.enu.states.game;
+package kz.enu.states.model;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Scanner;
 
-import io.socket.client.IO;
-import io.socket.client.Socket;
-import io.socket.emitter.Emitter;
 import kz.enu.TheTogyzQumalaq;
 import kz.enu.system.Registry;
 import kz.enu.sprites.Board;
 import kz.enu.sprites.Slot;
 import kz.enu.sprites.StoneBank;
 import kz.enu.states.view.GameOver;
-import kz.enu.states.model.GameStateManager;
-import kz.enu.states.model.State;
 import kz.enu.states.view.MenuState;
 import kz.enu.system.FontManager;
 import kz.enu.system.Util;
@@ -47,8 +38,6 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
     private static final String FONT_PATH = "arial.ttf";
     private static final int FONT_SIZE = 15;
 
-
-    private static int GAME_MODE;
     protected static boolean bAnimationStarted;
     private static int frameCounter = 0;
     private final static int slowness = 20;
@@ -59,8 +48,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
     protected static Slot[] slots = new Slot[18];
     protected static StoneBank[] stoneBanks = new StoneBank[2];
 
-    private static String sSaveFile;
-    private static FileHandle fileHandle;
+    protected static String sSaveFile;
 
     protected static boolean turn;
 
@@ -76,7 +64,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
     protected Texture slotTexture;
     private float alpha;
 
-    private static Texture tuzdykTexture;
+    protected static Texture tuzdykTexture;
     private static Texture glowTexture;
     private static Texture turnUpTexture;
     private static Texture turnDownTexture;
@@ -96,10 +84,10 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
     private Rectangle soundRectangle;
 
     public static int move = 0;
-    public static boolean IS_NEW_GAME = false;
-    public static int prevMove = 0;
     protected boolean bNeedHandleInput = true;
     protected boolean bNeedSaveGame = true;
+    protected boolean bNeedErrorSound = true;
+    protected boolean bUndoTurn;
 
     private BitmapFont oMainFont;
     private BitmapFont oMainFontFlipped;
@@ -112,24 +100,14 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
 
     private boolean isEffective = false;
 
-    public PlayState(GameStateManager gsm, int mode, boolean isNewGame) {
+    public PlayState(GameStateManager gsm) {
         super(gsm);
-
-        PlayState.GAME_MODE = mode;
-        PlayState.IS_NEW_GAME = isNewGame;
 
         initVariables();
         initResource();
         initSlots(slotTexture);
         initStoneBanks(stoneBankTexture);
 
-        if (IS_NEW_GAME)
-            try {
-                loadSavedFile();
-            } catch (FileNotFoundException fnfe) {}
-        else {
-            turn = true;
-        }
 
         Gdx.input.setInputProcessor(this);
         Gdx.input.setCatchBackKey(true);
@@ -183,44 +161,17 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
             return stoneBanks[0].currentStonesNumber + ":" + stoneBanks[1].currentStonesNumber + " ";
         }
     }
+    protected void refreshGame() throws FileNotFoundException {}
 
-    public static String getGameOverWords() {
-        if (GAME_MODE == Registry.SINGLE_PLAYER) {
-            if (isAtsyrau()) {
-                if (!turn) return TheTogyzQumalaq.LOCALE[9];
-                else return TheTogyzQumalaq.LOCALE[10];
-            } else if (stoneBanks[0].currentStonesNumber == 81 && stoneBanks[1].currentStonesNumber == 81) {
-                return TheTogyzQumalaq.LOCALE[11];
-            } else if (stoneBanks[0].currentStonesNumber > stoneBanks[1].currentStonesNumber) {
-                return TheTogyzQumalaq.LOCALE[9];
-            } else {
-                return TheTogyzQumalaq.LOCALE[10];
-            }
-        } else if (GAME_MODE == Registry.MULTIPLAYER || GAME_MODE == Registry.INTERNET) {
-            if (isAtsyrau()) {
-                if (!turn) return TheTogyzQumalaq.LOCALE[12];
-                else return TheTogyzQumalaq.LOCALE[13];
-            } else if (stoneBanks[0].currentStonesNumber == 81 && stoneBanks[1].currentStonesNumber == 81) {
-                return TheTogyzQumalaq.LOCALE[11];
-            } else if (stoneBanks[0].currentStonesNumber > stoneBanks[1].currentStonesNumber) {
-                return TheTogyzQumalaq.LOCALE[12];
-            } else {
-                return TheTogyzQumalaq.LOCALE[13];
-            }
-        } else {
-            return "";
-        }
+    protected void saveGame() throws FileNotFoundException {}
+
+    public String getGameOverWords() {
+        return "";
     }
 
-    private void initVariables() {
+    protected void initVariables() {
         camera.setToOrtho(false, TheTogyzQumalaq.WIDTH, TheTogyzQumalaq.HEIGHT);
         bAnimationStarted = false;
-
-        if (GAME_MODE == Registry.SINGLE_PLAYER) {
-            sSaveFile = "saveAI.txt";
-        } else if (GAME_MODE == Registry.MULTIPLAYER) {
-            sSaveFile = "save.txt";
-        }
     }
 
     private static void initSlots(Texture texture) {
@@ -246,7 +197,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         }
     }
 
-    private void initResource() {
+    protected void initResource() {
         // Texture initialization
         initTextures();
 
@@ -255,10 +206,6 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
 
         // Sound refactor
         initSound();
-
-        // fileHandle
-        if (GAME_MODE == Registry.SINGLE_PLAYER || GAME_MODE == Registry.MULTIPLAYER)
-            fileHandle = Gdx.files.local(sSaveFile);
 
         // Transition animation
         alpha = 1f;
@@ -334,11 +281,6 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
                 }
             } else {
                 handleSpecificAction();
-            }
-            if (GAME_MODE == Registry.INTERNET) {
-
-            } else if (GAME_MODE == Registry.MULTIPLAYER) {
-
             }
         }
     }
@@ -498,17 +440,17 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
 
     }
 
-    private static boolean isAtsyrau() {
+    protected static boolean isAtsyrau() {
         boolean b = true;
-        for (int i = 0; i < slots.length; i++) {
-            if (turn == slots[i].side && slots[i].currentStonesNumber != 0) {
+        for (Slot slot :slots) {
+            if (turn == slot.side && slot.currentStonesNumber != 0) {
                 b = false;
             }
         }
         return b;
     }
 
-    private static int makeMove(int slotIndex) {
+    protected int makeMove(int slotIndex) {
         Slot currentSlot = slots[slotIndex];
 
         int currentSlotStoneNumber = currentSlot.currentStonesNumber;
@@ -539,7 +481,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
 
         } else {
             turn ^= true;
-            if (bPlaySound && ((GAME_MODE == Registry.SINGLE_PLAYER && !turn) || (GAME_MODE == Registry.MULTIPLAYER || GAME_MODE == Registry.INTERNET)))
+            if (bPlaySound && bNeedErrorSound)
                 error.play();
             return -1;
         }
@@ -556,7 +498,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
 
         int lastSlotIndex;
         if (isAtsyrau()) {
-            gsm.set(new GameOver(gsm));
+            gsm.set(new GameOver(gsm, getGameOverWords()));
         }
 
         lastSlotIndex = makeMove(move);
@@ -594,7 +536,6 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
                         isMoveTuzdykMaker = true;
                     }
                 }
-                prevMove = move;
             }
             if (!isEffective)
                 if (bPlaySound) {
@@ -613,11 +554,6 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         if (keycode == Input.Keys.BACK) {
             gsm.set(new MenuState(gsm, TheTogyzQumalaq.POSTFIX));
 
-        } else if (keycode == Input.Keys.SPACE) {
-
-        } else if (keycode == Input.Keys.ENTER) {
-
-        } else if (keycode == Input.Keys.Q) {
         }
         return false;
     }
@@ -661,67 +597,6 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         return false;
     }
 
-    //Artificial
-    private static void loadGame() throws FileNotFoundException {
-        Scanner in = new Scanner(fileHandle.file());
-        int tmpi;
-        for (int i = 0; i < slots.length; i++) {
-            tmpi = in.nextInt();
-            if (tmpi == -1) {
-                slots[i].currentStonesNumber = 0;
-                slots[i].isTuzdyk = true;
-                slots[i].texture = tuzdykTexture;
-            } else {
-                slots[i].currentStonesNumber = tmpi;
-            }
-        }
-        for (int i = 0; i < stoneBanks.length; i++) {
-            stoneBanks[i].currentStonesNumber = in.nextInt();
-        }
-        String tmp = in.nextLine();
-
-        if (tmp.equals("true")) turn = true;
-        else if (tmp.equals("false")) turn = false;
-        bAnimationStarted = true;
-        in.close();
-    }
-
-    private static void saveGame() throws FileNotFoundException {
-        PrintWriter pw = new PrintWriter(fileHandle.file());
-        for (int i = 0; i < slots.length; i++) {
-            if (!slots[i].isTuzdyk) pw.println(slots[i].currentStonesNumber);
-            else pw.println(-1);
-            pw.flush();
-        }
-        for (int i = 0; i < stoneBanks.length; i++) {
-            pw.println(stoneBanks[i].currentStonesNumber);
-            pw.flush();
-        }
-        pw.println(turn);
-        pw.close();
-
-    }
-
-    private static void loadSavedFile() throws FileNotFoundException {
-        if (fileHandle.file().exists()) {
-            loadGame();
-        }
-    }
-
-    private static void refreshGame() throws FileNotFoundException {
-        if (GAME_MODE == Registry.MULTIPLAYER || GAME_MODE == Registry.MULTIPLAYER) {
-            PrintWriter pw = new PrintWriter(fileHandle.file());
-            for (int i = 0; i < slots.length; i++) {
-                pw.println(9);
-            }
-            for (int i = 0; i < stoneBanks.length; i++) {
-                pw.println(0);
-            }
-            pw.println(0);
-
-            pw.close();
-        }
-    }
 
     protected static void regShot() {
         shots.clear();
@@ -730,18 +605,11 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
 
     protected void undo() {
         if (isMoveTuzdykMaker) {
-            for (int i = 0; i < slots.length; i++) {
-                if (GAME_MODE == Registry.SINGLE_PLAYER) {
-                    if (slots[i].side == !turn) {
-                        slots[i].texture = slotTexture;
-                        slots[i].isTuzdyk = false;
+            for (Slot slot :slots) {
+                if (slot.side == bUndoTurn) {
+                    slot.texture = slotTexture;
+                    slot.isTuzdyk = false;
 
-                    }
-                } else if (GAME_MODE == Registry.MULTIPLAYER || GAME_MODE == Registry.INTERNET) {
-                    if (slots[i].side == turn) {
-                        slots[i].texture = slotTexture;
-                        slots[i].isTuzdyk = false;
-                    }
                 }
             }
             isMoveTuzdykMaker = false;
@@ -785,7 +653,7 @@ public class PlayState extends State implements InputProcessor, Input.TextInputL
         Gdx.app.log("X", "Cc");
     }
 
-    protected void fadeOffBlackWindow() {
+    private void fadeOffBlackWindow() {
         if (alpha > 0) {
             alpha -= 0.02f;
             blackSprite.setAlpha(alpha);
