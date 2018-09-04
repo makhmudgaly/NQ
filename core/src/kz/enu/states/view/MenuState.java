@@ -1,4 +1,4 @@
-package kz.enu.states;
+package kz.enu.states.view;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -9,8 +9,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 
-import kz.enu.ResID;
 import kz.enu.TheTogyzQumalaq;
+import kz.enu.system.Registry;
+import kz.enu.states.model.GameStateManager;
+import kz.enu.states.view.menu.MultiplayerModeState;
+import kz.enu.states.view.menu.LoadModeState;
+import kz.enu.states.model.State;
+import kz.enu.states.view.settings.SettingState;
+import kz.enu.system.Util;
 
 /**
  * Created by SLUX on 17.05.2017.
@@ -60,7 +66,7 @@ public class MenuState extends State implements InputProcessor {
     }
 
     private void initTextures(String POSTFIX) {
-        background = new Texture(ResID.MAIN_MENU + POSTFIX + ".png");
+        background = Util.getTexture(Registry.MAIN_MENU);
 
     }
 
@@ -99,16 +105,16 @@ public class MenuState extends State implements InputProcessor {
         if (offset >= TheTogyzQumalaq.WIDTH * 0.8f && backAnimatino) {
             switch (selected) {
                 case 0:
-                    gsm.set(new NewConState(gsm, 0));
+                    gsm.set(new LoadModeState(gsm, 0));
                     break;
                 case 1:
-                    gsm.set(new InterLocalState(gsm, 1));
+                    gsm.set(new MultiplayerModeState(gsm, 1));
                     break;
                 case 2:
                     gsm.set(new SettingState(gsm));
                     break;
                 case 3:
-                    gsm.set(new LoadingState(gsm, ResID.SINGLE_PLAYER, 0));
+                    gsm.set(new LoadingState(gsm, Registry.SINGLE_PLAYER, false));
                     break;
             }
         }

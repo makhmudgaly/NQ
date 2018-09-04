@@ -1,4 +1,4 @@
-package kz.enu.states;
+package kz.enu.states.model;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;

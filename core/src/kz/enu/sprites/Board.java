@@ -1,6 +1,6 @@
 package kz.enu.sprites;
 
-import kz.enu.states.PlayState;
+import kz.enu.states.model.PlayState;
 
 /**
  * Created by SLUX on 09.06.2017.

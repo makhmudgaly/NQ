@@ -1,4 +1,4 @@
-package kz.enu;
+package kz.enu.system;
 
 
 import com.badlogic.gdx.graphics.Color;
@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.Color;
  * Created by SLUX on 10.06.2017.
  */
 
-public class ResID {
+public class Registry {
     public static String[] skinsList = {"taha", "space", "empire", "slime", "primal", "aqua", "minimal", "social"};
     public static String[][] SKINS_NAME = {{"CLASSIC", "SPACE", "EMPIRE", "SLIME", "PRIMAL", "AQUA", "MINIMAL", "SOCIAL"},
                                             {"КЛАССИКА", "КОСМОС", "ИМПЕРИЯ", "ТОКСИЧНЫЙ", "ДОИСТОРИЧЕСКИЙ", "АКВА", "МИНИМАЛЬНЫЙ", "СОЦИУМ"},
@@ -72,7 +72,8 @@ public class ResID {
     public static final float[] LEVEL_OFFSET = {40f, 0f, 20f};
     public static final String RIGTH_ARROW = "►";
     public static final String LEFT_ARROW = "◄";
-    //new Color(0.853f,0.53f,0.223f,1f)   ,new Color(0.14f,0.06f,0f,1f) ,new Color(1f,0.753f,0.42f,1f) ,new Color(1f,0.753f,0.42f,1f)
+
+    // Color initialization
     public static final Color[] COLORS = {new Color(1f, 0.8f, 0.53f, 1f), new Color(0f, 1f, 0.99f, 1f), new Color(1f, 1f, 1f, 1f), new Color(0.1f, 1f, 0.1f, 1f), new Color(1f, 0.8f, 0f, 1f), new Color(0f, 0.153f, 0.173f, 1f), new Color(0.623f, 0.623f, 0.623f, 1f), new Color(1f, 1f, 1f, 1f)};
     public static final Color[] INDEX_COLORS = {new Color(1f, 0.8f, 0.53f, 1f), new Color(0f, 1f, 0.99f, 1f), new Color(1f, 0f, 0f, 1f), new Color(0.1f, 1f, 0.1f, 1f), new Color(1f, 0.8f, 0f, 1f), new Color(0f, 0.153f, 0.173f, 1f), new Color(0.2f, 0.2f, 0.2f, 1f), new Color(0.35f, 0.6f, 1f, 1f)};
     public static final Color[] NUMBER_COLORS = {new Color(1f, 1f, 1f, 1f), new Color(1f, 1f, 1f, 1f), new Color(1f, 1f, 1f, 1f), new Color(1f, 1f, 1f, 1f), new Color(1f, 1f, 1f, 1f), new Color(0.6f, 0.2f, 0f, 1f), new Color(0.623f, 0.623f, 0.623f, 1f), new Color(1f, 1f, 1f, 1f)};

@@ -1,4 +1,4 @@
-package kz.enu.states;
+package kz.enu.states.view.settings;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -14,10 +14,14 @@ import com.badlogic.gdx.math.Vector3;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
-import kz.enu.ResID;
 import kz.enu.TheTogyzQumalaq;
+import kz.enu.system.Registry;
+import kz.enu.states.model.GameStateManager;
+import kz.enu.states.model.State;
+import kz.enu.states.view.MenuState;
+import kz.enu.system.Util;
 
-import static kz.enu.ResID.skinsList;
+import static kz.enu.system.Registry.skinsList;
 import static kz.enu.TheTogyzQumalaq.botLevel;
 import static kz.enu.TheTogyzQumalaq.getMainFont;
 import static kz.enu.TheTogyzQumalaq.bPlaySound;
@@ -45,7 +49,6 @@ public class SettingState extends State implements InputProcessor {
     private static boolean isAnyThinkChanged;
 
     private static Sprite blackSprite;
-    private static Texture blackBackground;
 
     private Rectangle homeRectangle;
     private Rectangle soundRectangle;
@@ -64,7 +67,7 @@ public class SettingState extends State implements InputProcessor {
         Gdx.input.setInputProcessor(this);
         Gdx.input.setCatchBackKey(true);
         isAnyThinkChanged = false;
-        bg = new Texture(ResID.BACKGROUND + TheTogyzQumalaq.POSTFIX+".png");
+        bg = Util.getTexture(Registry.BACKGROUND);
         fileHandle = Gdx.files.local("profile.txt");
         try {
             pw = new PrintWriter(fileHandle.file());
@@ -77,48 +80,47 @@ public class SettingState extends State implements InputProcessor {
         glyphLayout.setText(TheTogyzQumalaq.getMainFont(),"OK");
         wOK = glyphLayout.width;
         glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getMainFont(),TheTogyzQumalaq.LOCALE[15]);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(), TheTogyzQumalaq.LOCALE[15]);
         wDesign = glyphLayout.width;
         glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getMainFont(),TheTogyzQumalaq.LOCALE[6]);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(), TheTogyzQumalaq.LOCALE[6]);
         wLanguage = glyphLayout.width;
         glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getMainFont(),TheTogyzQumalaq.LOCALE[8]);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(), TheTogyzQumalaq.LOCALE[8]);
         wLevel = glyphLayout.width;
         glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getMainFont(),TheTogyzQumalaq.LOCALE[7]);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(), TheTogyzQumalaq.LOCALE[7]);
         wDifficulty = glyphLayout.width;
         glyphLayout.reset();
         glyphLayout.setText(TheTogyzQumalaq.getMainFont(),"||||||||||||||||||||||||||||||");
         wProgress = glyphLayout.width;
         glyphLayout.reset();
-        glyphLayout.setText(TheTogyzQumalaq.getMainFont(),TheTogyzQumalaq.LOCALE[16]);
+        glyphLayout.setText(TheTogyzQumalaq.getMainFont(), TheTogyzQumalaq.LOCALE[16]);
         wMusic = glyphLayout.width;
 
         //System.out.println(wProgress);
-        homeTexture = new Texture(ResID.HOME + TheTogyzQumalaq.POSTFIX+".png");
-        soundOnTexture = new Texture(ResID.SOUND + TheTogyzQumalaq.POSTFIX+".png");
-        soundOffTexture = new Texture(ResID.SOUND_OFF + TheTogyzQumalaq.POSTFIX+".png");
-        wrapperTexture = new Texture(ResID.WRAPPER + TheTogyzQumalaq.POSTFIX+".png");
+        homeTexture = Util.getTexture(Registry.HOME);
+        soundOnTexture = Util.getTexture(Registry.SOUND);
+        soundOffTexture = Util.getTexture(Registry.SOUND_OFF);
+        wrapperTexture = Util.getTexture(Registry.WRAPPER);
         soundTexture = TheTogyzQumalaq.bPlaySound ?soundOnTexture:soundOffTexture;
         homeRectangle = new Rectangle(812f,465f,homeTexture.getWidth()+20,homeTexture.getHeight()+20);
         soundRectangle = new Rectangle(812f,400f,soundTexture.getWidth()+20,soundTexture.getHeight()+20);
         acceptRectangle = new Rectangle(754f,30f,wOK+100f,70f);
         designRectangle = new Rectangle(120f,440f,wrapperTexture.getWidth(),80f);
 
-        blackBackground = new Texture(ResID.BLACK_BG);
-        blackSprite = new Sprite(blackBackground);
+        blackSprite = new Sprite(new Texture(Registry.BLACK_BG));
         alpha = 1f;
         blackSprite.setAlpha(alpha);
         blackSprite.setPosition(0,0);
 
         languageLeftArrowRectangle = new Rectangle(420f,250f,43f,50f);
-        languageRightArrowRectangle = new Rectangle(420f+43f+ getMainFont().getSpaceWidth()*2+ResID.LANGUAGE_WIDTH[2],250f,43f,50f);
+        languageRightArrowRectangle = new Rectangle(420f+43f+ getMainFont().getSpaceWidth()*2+ Registry.LANGUAGE_WIDTH[2],250f,43f,50f);
         difficultyLeftArrowRectangle = new Rectangle(420f,350f,43f,50f);
-        difficultyRightArrowRectangle = new Rectangle(420f+43f+ getMainFont().getSpaceWidth()*2+ResID.LANGUAGE_WIDTH[2],350f,43f,50f);
+        difficultyRightArrowRectangle = new Rectangle(420f+43f+ getMainFont().getSpaceWidth()*2+ Registry.LANGUAGE_WIDTH[2],350f,43f,50f);
         initSlider();
-        camera.setToOrtho(false, TheTogyzQumalaq.WIDTH,TheTogyzQumalaq.HEIGHT);
-        //System.out.println((420f+43f+getMainFont().getSpaceWidth()*2+ResID.LANGUAGE_WIDTH[2]));
+        camera.setToOrtho(false, TheTogyzQumalaq.WIDTH, TheTogyzQumalaq.HEIGHT);
+        //System.out.println((420f+43f+getMainFont().getSpaceWidth()*2+Registry.LANGUAGE_WIDTH[2]));
         volumeSlider = new Rectangle(420f,140f,wProgress,60f);
     }
 
@@ -142,10 +144,10 @@ public class SettingState extends State implements InputProcessor {
             if(acceptRectangle.contains(tmp.x,tmp.y)){
                 accept();
             }else if(homeRectangle.contains(tmp.x,tmp.y)){
-                if(TheTogyzQumalaq.bPlaySound)TheTogyzQumalaq.getButtonSound().play();
-                gsm.set(new MenuState(gsm,TheTogyzQumalaq.POSTFIX));
+                if(TheTogyzQumalaq.bPlaySound) TheTogyzQumalaq.getButtonSound().play();
+                gsm.set(new MenuState(gsm, TheTogyzQumalaq.POSTFIX));
             }else if(designRectangle.contains(tmp.x,tmp.y)){
-                if(TheTogyzQumalaq.bPlaySound)TheTogyzQumalaq.getButtonSound().play();
+                if(TheTogyzQumalaq.bPlaySound) TheTogyzQumalaq.getButtonSound().play();
                 gsm.set(new DesignState(gsm, selectedLanguage));
             }else if(soundRectangle.contains(tmp.x,tmp.y)){
                 if(bPlaySound){
@@ -158,18 +160,18 @@ public class SettingState extends State implements InputProcessor {
                     soundTexture = soundOnTexture;
                 }
             }else if(languageLeftArrowRectangle.contains(tmp.x,tmp.y)){
-                if(TheTogyzQumalaq.bPlaySound)TheTogyzQumalaq.getButtonSound().play();
+                if(TheTogyzQumalaq.bPlaySound) TheTogyzQumalaq.getButtonSound().play();
                 selectedLanguage--;
                 if(selectedLanguage == -1) selectedLanguage = 2;
             }else if(languageRightArrowRectangle.contains(tmp.x,tmp.y)){
-                if(TheTogyzQumalaq.bPlaySound)TheTogyzQumalaq.getButtonSound().play();
+                if(TheTogyzQumalaq.bPlaySound) TheTogyzQumalaq.getButtonSound().play();
                 selectedLanguage =(selectedLanguage +1)%3;
             }else if(difficultyLeftArrowRectangle.contains(tmp.x,tmp.y)){
-                if(TheTogyzQumalaq.bPlaySound)TheTogyzQumalaq.getButtonSound().play();
+                if(TheTogyzQumalaq.bPlaySound) TheTogyzQumalaq.getButtonSound().play();
                 botLevel--;
                 if(botLevel == -1)botLevel = 3;
             }else if(difficultyRightArrowRectangle.contains(tmp.x,tmp.y)){
-                if(TheTogyzQumalaq.bPlaySound)TheTogyzQumalaq.getButtonSound().play();
+                if(TheTogyzQumalaq.bPlaySound) TheTogyzQumalaq.getButtonSound().play();
                 botLevel=(botLevel+1)%4;
             }
             //System.out.println("[X:"+tmp.x +"][Y:"+ tmp.y+"]");
@@ -186,7 +188,7 @@ public class SettingState extends State implements InputProcessor {
         pw.println((int)(TheTogyzQumalaq.getBackgroundMusic().getVolume()*32));
         pw.flush();
         new TheTogyzQumalaq().reboot();
-        gsm.set(new MenuState(gsm,TheTogyzQumalaq.POSTFIX));
+        gsm.set(new MenuState(gsm, TheTogyzQumalaq.POSTFIX));
     }
 
     @Override
@@ -203,25 +205,25 @@ public class SettingState extends State implements InputProcessor {
     @Override
     public void render(SpriteBatch sb) {
         sb.begin();
-        sb.draw(bg,0,0, TheTogyzQumalaq.WIDTH,TheTogyzQumalaq.HEIGHT);
+        sb.draw(bg,0,0, TheTogyzQumalaq.WIDTH, TheTogyzQumalaq.HEIGHT);
         for(int i = 0;i<4;i++){
             sb.draw(wrapperTexture,120f,440f-i*100f);
         }
             sb.draw(wrapperTexture,734f,33f);
-        TheTogyzQumalaq.getMainFont().draw(sb,TheTogyzQumalaq.LOCALE[15],(wrapperTexture.getWidth()-wDesign)/2+120f,500f);
+        TheTogyzQumalaq.getMainFont().draw(sb, TheTogyzQumalaq.LOCALE[15],(wrapperTexture.getWidth()-wDesign)/2+120f,500f);
 
-        TheTogyzQumalaq.getMainFont().draw(sb,TheTogyzQumalaq.LOCALE[6],420f-wLanguage,300f);
-        TheTogyzQumalaq.getSecondaryFont().draw(sb,ResID.LEFT_ARROW,420f,300f);
-        TheTogyzQumalaq.getMainFont().draw(sb,ResID.LANGUAGES[selectedLanguage],420f+63f+(getMainFont().getSpaceWidth()*2+ResID.LANGUAGE_WIDTH[2] - ResID.LANGUAGE_WIDTH[selectedLanguage])/2,300f);
-        TheTogyzQumalaq.getSecondaryFont().draw(sb,ResID.RIGTH_ARROW,420f+43f+ getMainFont().getSpaceWidth()*2+ResID.LANGUAGE_WIDTH[2],300f);
+        TheTogyzQumalaq.getMainFont().draw(sb, TheTogyzQumalaq.LOCALE[6],420f-wLanguage,300f);
+        TheTogyzQumalaq.getSecondaryFont().draw(sb, Registry.LEFT_ARROW,420f,300f);
+        TheTogyzQumalaq.getMainFont().draw(sb, Registry.LANGUAGES[selectedLanguage],420f+63f+(getMainFont().getSpaceWidth()*2+ Registry.LANGUAGE_WIDTH[2] - Registry.LANGUAGE_WIDTH[selectedLanguage])/2,300f);
+        TheTogyzQumalaq.getSecondaryFont().draw(sb, Registry.RIGTH_ARROW,420f+43f+ getMainFont().getSpaceWidth()*2+ Registry.LANGUAGE_WIDTH[2],300f);
 
-        TheTogyzQumalaq.getMainFont().draw(sb,TheTogyzQumalaq.LOCALE[7],420f-wDifficulty,400f);
-        TheTogyzQumalaq.getSecondaryFont().draw(sb,ResID.LEFT_ARROW,420f,400f);
-        TheTogyzQumalaq.getMainFont().draw(sb,TheTogyzQumalaq.LOCALE[8]+" "+(TheTogyzQumalaq.botLevel+1),420f+ getMainFont().getSpaceWidth()+43f+ResID.LEVEL_OFFSET[oldSelectedLanguage],400f);
-        TheTogyzQumalaq.getSecondaryFont().draw(sb,ResID.RIGTH_ARROW,420f+43+ getMainFont().getSpaceWidth()*2+ResID.LANGUAGE_WIDTH[2],400f);
+        TheTogyzQumalaq.getMainFont().draw(sb, TheTogyzQumalaq.LOCALE[7],420f-wDifficulty,400f);
+        TheTogyzQumalaq.getSecondaryFont().draw(sb, Registry.LEFT_ARROW,420f,400f);
+        TheTogyzQumalaq.getMainFont().draw(sb, TheTogyzQumalaq.LOCALE[8]+" "+(TheTogyzQumalaq.botLevel+1),420f+ getMainFont().getSpaceWidth()+43f+ Registry.LEVEL_OFFSET[oldSelectedLanguage],400f);
+        TheTogyzQumalaq.getSecondaryFont().draw(sb, Registry.RIGTH_ARROW,420f+43+ getMainFont().getSpaceWidth()*2+ Registry.LANGUAGE_WIDTH[2],400f);
 
         TheTogyzQumalaq.getMainFont().draw(sb,volumeSliderBar,420f,200f);
-        TheTogyzQumalaq.getMainFont().draw(sb,TheTogyzQumalaq.LOCALE[16],420f-wMusic,200f);
+        TheTogyzQumalaq.getMainFont().draw(sb, TheTogyzQumalaq.LOCALE[16],420f-wMusic,200f);
 
         TheTogyzQumalaq.getMainFont().draw(sb,"OK",754f,90f);
         sb.draw(homeTexture,822f,475f);
@@ -247,7 +249,7 @@ public class SettingState extends State implements InputProcessor {
     public boolean keyDown(int keycode) {
         if(keycode == Input.Keys.BACK){
             // Optional back button handling (e.g. ask for confirmation)
-            gsm.set(new MenuState(gsm,TheTogyzQumalaq.POSTFIX));
+            gsm.set(new MenuState(gsm, TheTogyzQumalaq.POSTFIX));
             /*if (shouldReallyQuit)
                 Gdx.app.exit();*/
         }
@@ -284,8 +286,8 @@ public class SettingState extends State implements InputProcessor {
         Vector3 tmp = new Vector3(screenX,screenY,0);
         camera.unproject(tmp);
             if(volumeSlider.contains(tmp.x,tmp.y)){
-                System.out.println(Gdx.graphics.getWidth()+" "+screenX+":"+screenY+"   "+(screenX -(Gdx.graphics.getWidth()-TheTogyzQumalaq.WIDTH)/2-420f)/wProgress);
-                TheTogyzQumalaq.getBackgroundMusic().setVolume((screenX -(Gdx.graphics.getWidth()-TheTogyzQumalaq.WIDTH)/2-420f)/wProgress);
+                System.out.println(Gdx.graphics.getWidth()+" "+screenX+":"+screenY+"   "+(screenX -(Gdx.graphics.getWidth()- TheTogyzQumalaq.WIDTH)/2-420f)/wProgress);
+                TheTogyzQumalaq.getBackgroundMusic().setVolume((screenX -(Gdx.graphics.getWidth()- TheTogyzQumalaq.WIDTH)/2-420f)/wProgress);
                 initSlider();
             }
 
